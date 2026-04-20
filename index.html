@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>AbcZUL - Juego Educativo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+  --rojo: #e74c3c;
+  --verde: #2ecc71;
+  --amarillo: #f1c40f;
+  --azul: #3498db;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f4f7f6;
+  text-align: center;
+}
+
+.titulo {
+  font-size: 48px;
+  margin: 10px;
+}
+
+.layout {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.contenedor {
+  max-width: 600px;
+  width: 100%;
+}
+
+/* 🔥 BARRA */
+.torre-container {
+  display: grid;
+  gap: 4px;
+  background: #ddd;
+  height: 40px;
+  border-radius: 10px;
+  padding: 6px;
+  margin-bottom: 15px;
+}
+
+.disco {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+}
+
+.basico .disco { background: var(--verde); }
+.medio .disco { background: var(--amarillo); }
+.avanzado .disco { background: var(--rojo); }
+
+/* UI */
+.fila {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+select {
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.audio-linea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.audioBtn {
+  font-size: 50px;
+  border-radius: 50%;
+  width: 90px;
+  height: 90px;
+}
+
+#mensaje {
+  font-size: 28px;
+  font-weight: bold;
+  min-width: 200px;
+}
+
+/* cartas */
+.cartas {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.carta {
+  width: 120px;
+  height: 160px;
+  background: white;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  cursor: pointer;
+  border: 5px solid transparent;
+}
+
+.b-rojo { border-color: red; }
+.b-verde { border-color: green; }
+.b-azul { border-color: blue; }
+
+.carta img {
+  max-width: 100%;
+  max-height: 100%;
+}
+</style>
+</head>
+
+<body>
+
+<h1 class="titulo">AbcZUL</h1>
+
+<div class="input-nombre">
+  <input type="text" id="nombreUsuario" placeholder="Tu nombre">
+</div>
+
+<div class="layout">
+<div class="contenedor">
+
+<div id="torre" class="torre-container"></div>
+
+<div class="fila">
+  <span>Nivel</span>
+
+  <select id="modo">
+    <option value="numeros">🔢 Números</option>
+    <option value="vocales">🅰️ Vocales</option>
+    <option value="cuerpo">👂 Cuerpo</option>
+  </select>
+
+  <select id="dificultad">
+    <option value="4">Básico</option>
+    <option value="7">Medio</option>
+    <option value="10">Avanzado</option>
+  </select>
+</div>
+
+<div class="audio-linea">
+  <button id="btnAudio" class="audioBtn">🔊</button>
+  <div id="mensaje">-</div>
+</div>
+
+<div class="cartas" id="cartas"></div>
+
+</div>
+</div>
+
+<script>
+let nivel = 0;
+let objetivoActual = "";
+let bloqueado = false;
+
+let MAX_NIVEL = 4;
+let dificultadClase = "basico";
+
+const colores = ["b-rojo","b-verde","b-azul"];
+
+function hablar(texto) {
+  speechSynthesis.cancel();
+  speechSynthesis.speak(new SpeechSynthesisUtterance(texto));
+}
+
+/* 🔥 BARRA */
+function actualizarTorre() {
+  const torre = document.getElementById("torre");
+  torre.innerHTML = "";
+
+  torre.style.gridTemplateColumns = `repeat(${MAX_NIVEL}, 1fr)`;
+  torre.className = "torre-container " + dificultadClase;
+
+  for (let i = 1; i <= MAX_NIVEL; i++) {
+    const d = document.createElement("div");
+    if (i <= nivel) d.className = "disco";
+    torre.appendChild(d);
+  }
+}
+
+/* conjunto */
+function obtenerConjunto() {
+  const modo = document.getElementById("modo").value;
+  if (modo === "numeros") return "0123456789".split("");
+  if (modo === "cuerpo") return ["ceja","orejas","nariz","ojos","boca"];
+  return ["A","E","I","O","U"];
+}
+
+function nuevoJuego() {
+  bloqueado = false;
+
+  const cartas = document.getElementById("cartas");
+  const mensaje = document.getElementById("mensaje");
+
+  cartas.innerHTML = "";
+  mensaje.innerText = "";
+
+  actualizarTorre();
+
+  const datos = obtenerConjunto();
+  objetivoActual = datos[Math.floor(Math.random()*datos.length)];
+
+  let opciones = datos.filter(x=>x!==objetivoActual);
+  opciones.sort(()=>Math.random()-0.5);
+
+  let finales = [objetivoActual, opciones[0], opciones[1]];
+  finales.sort(()=>Math.random()-0.5);
+
+  hablar("Aprieta " + objetivoActual);
+
+  /* 🔥 CARTAS CON IMAGEN O TEXTO */
+  finales.forEach((val,i)=>{
+    const div = document.createElement("div");
+    div.className = "carta " + colores[i];
+
+    const img = new Image();
+    img.src = `./imagenes/${val}.jpg`;
+
+    img.onload = () => {
+      div.innerHTML = "";
+      div.appendChild(img);
+    };
+
+    img.onerror = () => {
+      div.innerHTML = val;
+    };
+
+    div.onclick = ()=>{
+
+      if (bloqueado) return;
+
+      if (val === objetivoActual) {
+        bloqueado = true;
+        nivel++;
+        actualizarTorre();
+
+        if (nivel >= MAX_NIVEL) {
+          const nombre = document.getElementById("nombreUsuario").value || "";
+          const texto = nombre ? `¡Felicidades ${nombre}!` : "¡FELICIDADES!";
+
+          mensaje.innerText = "✔️ " + texto;
+          hablar(texto);
+
+          setTimeout(()=>{
+            nivel = 0;
+            actualizarTorre();
+            nuevoJuego();
+          },2500);
+
+        } else {
+          mensaje.innerText = "✔️";
+          setTimeout(nuevoJuego, 800);
+        }
+
+      } else {
+        mensaje.innerText = "❌";
+      }
+    };
+
+    cartas.appendChild(div);
+  });
+}
+
+/* dificultad */
+document.getElementById("dificultad").onchange = (e)=>{
+  const val = parseInt(e.target.value);
+  MAX_NIVEL = val;
+
+  if (val === 4) dificultadClase = "basico";
+  else if (val === 7) dificultadClase = "medio";
+  else dificultadClase = "avanzado";
+
+  nivel = 0;
+  nuevoJuego();
+};
+
+document.getElementById("modo").onchange = ()=>{
+  nivel = 0;
+  nuevoJuego();
+};
+
+document.getElementById("btnAudio").onclick = ()=>{
+  hablar("Aprieta " + objetivoActual);
+};
+
+window.onload = nuevoJuego;
+</script>
+
+</body>
+</html>
