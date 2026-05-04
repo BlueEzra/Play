@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cuadrícula de Imágenes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 150px);
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .cell {
+      border: 1px solid #ccc;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: #f9f9f9;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Cuadrícula de Imágenes</h2>
+
+<div class="grid" id="grid"></div>
+
+<script>
+  const nombres = [
+    "agua",
+    "perro",
+    "casa",
+    "arbol",
+    "auto",
+    "flor",
+    "mesa",
+    "silla"
+  ];
+
+  const grid = document.getElementById("grid");
+
+  nombres.forEach(nombre => {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+
+    const img = document.createElement("img");
+    img.src = `imagenes/cuadro/${nombre}.jpg`;
+    img.alt = nombre;
+
+    // Si no carga la imagen
+    img.onerror = () => {
+      img.remove(); // quitar imagen
+      cell.textContent = nombre.toUpperCase(); // solo la letra
+    };
+
+    // Si carga bien, la agrega
+    img.onload = () => {
+      cell.innerHTML = "";
+      cell.appendChild(img);
+    };
+
+    cell.appendChild(img);
+
+    cell.addEventListener("click", () => {
+      hablar(nombre);
+    });
+
+    grid.appendChild(cell);
+  });
+
+  function hablar(texto) {
+    const utterance = new SpeechSynthesisUtterance(texto);
+    utterance.lang = "es-ES";
+    speechSynthesis.speak(utterance);
+  }
+</script>
+
+</body>
+</html>
