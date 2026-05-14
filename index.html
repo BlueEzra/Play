@@ -125,7 +125,44 @@ select {
 </head>
 
 <body>
+<!-- MENU -->
+<div class="mini-menu">
+  <a href="index.html">Index</a>
+  <a href="cuadro.html">Cuadro</a>
+  <a href="teclado.html">Teclado</a>
+</div>
 
+<style>
+  .mini-menu{
+    position: fixed;
+    top: 10px;
+    right: 10px;
+
+    display: flex;
+    gap: 8px;
+
+    padding: 6px 10px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 10px;
+
+    z-index: 9999;
+    font-family: Arial, sans-serif;
+  }
+
+  .mini-menu a{
+    text-decoration: none;
+    color: white;
+    background: #3498db;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    transition: 0.2s;
+  }
+
+  .mini-menu a:hover{
+    background: #2980b9;
+  }
+</style>
 <h1 class="titulo">AbcZUL</h1>
 
 <div class="input-nombre">
@@ -151,9 +188,11 @@ select {
     <option value="7">Medio</option>
     <option value="10">Avanzado</option>
   </select>
+
 </div>
 
 <div class="audio-linea">
+
   <button id="btnAudio" class="audioBtn">🔊</button>
   <div id="mensaje">-</div>
 </div>
@@ -229,8 +268,11 @@ function nuevoJuego() {
     div.className = "carta " + colores[i];
 
     const img = new Image();
-    img.src = `./imagenes/${val}.jpg`;
-
+  //  img.src = `./imagenes/${val}.jpg`;
+  const categoria=document.getElementById("modo").value;
+  console.log(categoria);
+    img.src = `imagenes/juego/${categoria}/${val}.jpg`;
+	console.log(img.src);
     img.onload = () => {
       div.innerHTML = "";
       div.appendChild(img);
@@ -268,7 +310,7 @@ function nuevoJuego() {
         }
 
       } else {
-	   hablar("Inténtalo de nuevo " );
+	   hablar("Intentalo de nuevo " );
         mensaje.innerText = "❌";
       }
     };

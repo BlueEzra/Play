@@ -2,6 +2,45 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <!-- MENU -->
+<div class="mini-menu">
+  <a href="index.html">Index</a>
+  <a href="cuadro.html">Cuadro</a>
+  <a href="teclado.html">Teclado</a>
+</div>
+
+<style>
+  .mini-menu{
+    position: fixed;
+    top: 10px;
+    right: 10px;
+
+    display: flex;
+    gap: 8px;
+
+    padding: 6px 10px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 10px;
+
+    z-index: 9999;
+    font-family: Arial, sans-serif;
+  }
+
+  .mini-menu a{
+    text-decoration: none;
+    color: white;
+    background: #3498db;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    transition: 0.2s;
+  }
+
+  .mini-menu a:hover{
+    background: #2980b9;
+  }
+</style>
+
   <title>Cuadrícula de Imágenes</title>
   <style>
     body {
@@ -25,8 +64,9 @@
       justify-content: center;
       cursor: pointer;
       background: #f9f9f9;
-      font-size: 24px;
+      font-size: 18px;
       font-weight: bold;
+      overflow: hidden;
     }
 
     .cell img {
@@ -34,62 +74,80 @@
       height: 100%;
       object-fit: cover;
     }
+
+    select {
+      padding: 8px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
 
 <h2>Cuadrícula de Imágenes</h2>
 
+<select id="categoria">
+  <option value="comidas">Comida</option>
+  <option value="actividades">Actividades</option>
+  <option value="sentimientos">Sentimiento</option>
+</select>
+
 <div class="grid" id="grid"></div>
 
 <script>
-  const nombres = [
-    "agua",
-    "platano",
-    "gorra",
-    "arbol",
-    "auto",
-    "flor",
-    "mesa",
-    "silla"
-  ];
+  const datos = {
+    comidas: ["agua", "sandia", "fresa", "huevo","pollo","leche","tomate","aguacate"],
+    actividades: ["jugar", "leer", "ver_tv", "dormir"],
+    sentimientos: ["me_siento_feliz", "me_siento_enfermo", "me_siento_enojado", "me_siento_cansado"]
+  };
 
   const grid = document.getElementById("grid");
+  const select = document.getElementById("categoria");
 
-  nombres.forEach(nombre => {
-    const cell = document.createElement("div");
-    cell.className = "cell";
+  function render(categoria) {
+    grid.innerHTML = "";
 
-    const img = document.createElement("img");
-    img.src = `imagenes/cuadro/${nombre}.jpg`;
-    img.alt = nombre;
+    const nombres = datos[categoria];
 
-    // Si no carga la imagen
-    img.onerror = () => {
-      img.remove(); // quitar imagen
-      cell.textContent = nombre.toUpperCase(); // solo la letra
-    };
+    nombres.forEach(nombre => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
 
-    // Si carga bien, la agrega
-    img.onload = () => {
-      cell.innerHTML = "";
+      const img = document.createElement("img");
+      img.src = `imagenes/cuadro/${categoria}/${nombre}.jpg`;
+      img.alt = nombre;
+
+      img.onerror = () => {
+        cell.textContent = nombre.toUpperCase();
+      };
+
+      img.onload = () => {
+        cell.innerHTML = "";
+        cell.appendChild(img);
+      };
+
       cell.appendChild(img);
-    };
 
-    cell.appendChild(img);
+      cell.addEventListener("click", () => {
+        hablar(nombre);
+      });
 
-    cell.addEventListener("click", () => {
-      hablar(nombre);
+      grid.appendChild(cell);
     });
+  }
 
-    grid.appendChild(cell);
+  select.addEventListener("change", (e) => {
+    render(e.target.value);
   });
 
   function hablar(texto) {
-    const utterance = new SpeechSynthesisUtterance(texto);
+    const utterance = new SpeechSynthesisUtterance(texto.replaceAll("_",""));
     utterance.lang = "es-ES";
     speechSynthesis.speak(utterance);
   }
+
+  // inicial
+  render(select.value);
 </script>
 
 </body>

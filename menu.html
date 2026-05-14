@@ -1,0 +1,32 @@
+<!-- menu.html -->
+<div class="mini-menu">
+  <a href="index.html">Index</a>
+  <a href="cuadro.html">Cuadro</a>
+  <a href="teclado.html">Teclado</a>
+</div>
+
+<style>
+  .mini-menu{
+    position: fixed;
+    top: 10px;
+    right:: 10px;
+    display: flex;
+    gap: 8px;
+    z-index: 999;
+  }
+
+  .mini-menu a{
+    text-decoration: none;
+    background: #3498db;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    transition: 0.2s;
+  }
+
+  .mini-menu a:hover{
+    background: #2980b9;
+  }
+</style>
