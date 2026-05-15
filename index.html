@@ -80,10 +80,10 @@ select {
 }
 
 .audioBtn {
-  font-size: 50px;
-  border-radius: 50%;
-  width: 90px;
-  height: 90px;
+  font-size: 20px;
+  border-radius: 60%;
+  width: 40px;
+  height: 30px;
 }
 
 #mensaje {
@@ -175,30 +175,35 @@ select {
 <div id="torre" class="torre-container"></div>
 
 <div class="fila">
-  <span>Nivel</span>
+  <span>Modo</span>
 
   <select id="modo">
-    <option value="numeros">🔢 Números</option>
+    <option value="numeros0">🔢 Números [0-9]</option>
+	<option value="numeros1">🔢 Números [0-20]</option>
     <option value="vocales">🅰️ Vocales</option>
     <option value="cuerpo">👂 Cuerpo</option>
   </select>
+   <button id="btnAudio" class="audioBtn">🔊</button>
+   
 
+<!--
   <select id="dificultad">
     <option value="4">Básico</option>
     <option value="7">Medio</option>
     <option value="10">Avanzado</option>
   </select>
-
+-->
 </div>
-
+<!--
 <div class="audio-linea">
 
   <button id="btnAudio" class="audioBtn">🔊</button>
   <div id="mensaje">-</div>
 </div>
-
+-->
 <div class="cartas" id="cartas"></div>
-
+<br>
+   <div id="mensaje"  >-</div>
 </div>
 </div>
 
@@ -207,7 +212,7 @@ let nivel = 0;
 let objetivoActual = "";
 let bloqueado = false;
 
-let MAX_NIVEL = 4;
+let MAX_NIVEL = 10;
 let dificultadClase = "basico";
 
 const colores = ["b-rojo","b-verde","b-azul"];
@@ -235,7 +240,8 @@ function actualizarTorre() {
 /* conjunto */
 function obtenerConjunto() {
   const modo = document.getElementById("modo").value;
-  if (modo === "numeros") return "0123456789".split("");
+  if (modo === "numeros0") return "0123456789".split("");
+  if (modo === "numeros1") return "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20".split(",");
   if (modo === "cuerpo") return ["ceja","oido","nariz","ojo","boca","frente","lengua"];
   return ["A","E","I","O","U"];
 }
@@ -320,6 +326,7 @@ function nuevoJuego() {
 }
 
 /* dificultad */
+/*
 document.getElementById("dificultad").onchange = (e)=>{
   const val = parseInt(e.target.value);
   MAX_NIVEL = val;
@@ -331,7 +338,7 @@ document.getElementById("dificultad").onchange = (e)=>{
   nivel = 0;
   nuevoJuego();
 };
-
+*/
 document.getElementById("modo").onchange = ()=>{
   nivel = 0;
   nuevoJuego();
