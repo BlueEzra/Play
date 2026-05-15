@@ -4,7 +4,6 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Teclado Responsive</title>
@@ -91,21 +90,35 @@ h2{
 
     width:98%;
 
-    height:50px;
+    max-width:1400px;
 
-    margin:5px auto;
+    height:70px;
+
+    margin:5px auto 2px auto;
 
     display:block;
 
     text-align:center;
 
-    font-size:28px;
+    font-size:32px;
 
-    border-radius:10px;
+    font-weight:bold;
+
+    border-radius:12px;
 
     border:2px solid #999;
 
-    box-shadow: inset 0 3px 6px rgba(0,0,0,0.2);
+    background:white;
+
+    box-shadow:
+        inset 0 3px 6px rgba(0,0,0,0.2),
+        0 2px 4px rgba(0,0,0,0.15);
+
+    letter-spacing:2px;
+
+    padding:5px 10px;
+
+    outline:none;
 }
 
 /* ======================================
@@ -116,18 +129,18 @@ h2{
 
     width:99vw;
 
-    height:calc(100vh - 130px);
-
     margin:auto;
 
     display:flex;
 
     flex-direction:column;
 
-    justify-content:center;
+    justify-content:flex-start;
 }
 
-/* FILAS */
+/* ======================================
+   FILAS
+====================================== */
 
 .fila{
 
@@ -142,7 +155,9 @@ h2{
     width:100%;
 }
 
-/* BOTONES */
+/* ======================================
+   BOTONES
+====================================== */
 
 button{
 
@@ -183,7 +198,7 @@ button:active{
 }
 
 /* ======================================
-   📱 VERTICAL
+   📱 MOBILE / VERTICAL
 ====================================== */
 
 @media (orientation: portrait){
@@ -194,14 +209,15 @@ button:active{
 
     #pantalla{
 
-        height:60px;
+        height:80px;
 
-        font-size:34px;
+        font-size:38px;
     }
 
-    /* PARTIR FILAS */
+    /* DIVIDIR FILAS */
 
     .fila{
+
         flex-wrap:wrap;
     }
 
@@ -221,12 +237,13 @@ button:active{
 }
 
 /* ======================================
-   💻 HORIZONTAL
+   💻 HORIZONTAL NORMAL
 ====================================== */
 
 @media (orientation: landscape){
 
     .fila{
+
         flex-wrap:nowrap;
     }
 
@@ -235,6 +252,71 @@ button:active{
         height:40px;
 
         font-size:20px;
+    }
+}
+
+/* ======================================
+   🖥️ PC GRANDE
+====================================== */
+
+@media screen and (min-width:1000px){
+
+    body{
+
+        padding:10px;
+    }
+
+    h2{
+
+        font-size:42px;
+
+        margin-bottom:10px;
+    }
+
+    #pantalla{
+
+        height:110px;
+
+        font-size:52px;
+
+        border-radius:16px;
+
+        margin-bottom:4px;
+    }
+
+    #teclado{
+
+        max-width:1400px;
+    }
+
+    .fila{
+
+        gap:10px;
+
+        margin:4px 0;
+    }
+
+    button{
+
+        height:80px;
+
+        font-size:34px;
+
+        border-radius:14px;
+
+        box-shadow:0 5px #666;
+    }
+
+    .mini-menu{
+
+        padding:10px 14px;
+    }
+
+    .mini-menu a{
+
+        font-size:18px;
+
+        padding:10px 14px;
     }
 }
 
@@ -256,13 +338,23 @@ button:active{
 
 </div>
 
+<!-- TITULO -->
+
 <h2>Teclado</h2>
 
+<!-- PANTALLA -->
+
 <input type="text" id="pantalla" readonly>
+
+<!-- TECLADO -->
 
 <div id="teclado"></div>
 
 <script>
+
+/* ======================================
+   TECLAS
+====================================== */
 
 const letras = [
 
@@ -276,9 +368,11 @@ const letras = [
 
 ];
 
-const contenedor = document.getElementById("teclado");
+/* ======================================
+   CREAR TECLADO
+====================================== */
 
-/* CREAR TECLADO */
+const contenedor = document.getElementById("teclado");
 
 letras.forEach(fila => {
 
@@ -307,13 +401,17 @@ letras.forEach(fila => {
     contenedor.appendChild(divFila);
 });
 
-/* FUNCIONES */
+/* ======================================
+   FUNCIONES
+====================================== */
 
 function agregar(letra){
 
     const pantalla = document.getElementById("pantalla");
 
     const accion = letra.split(",")[0];
+
+    /* LIMPIAR */
 
     if(accion == "Limpiar"){
 
@@ -322,12 +420,16 @@ function agregar(letra){
         return;
     }
 
+    /* ELIMINAR */
+
     if(accion == "Eliminar"){
 
         pantalla.value = pantalla.value.slice(0,-1);
 
         return;
     }
+
+    /* LEER */
 
     if(accion == "Leer"){
 
@@ -339,6 +441,8 @@ function agregar(letra){
 
         return;
     }
+
+    /* ESPACIO */
 
     letra = (accion == "Espacio") ? " " : letra;
 
