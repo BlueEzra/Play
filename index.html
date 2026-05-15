@@ -125,12 +125,7 @@ select {
 </head>
 
 <body>
-<!-- MENU -->
-<div class="mini-menu">
-  <a href="index.html">Index</a>
-  <a href="cuadro.html">Cuadro</a>
-  <a href="teclado.html">Teclado</a>
-</div>
+
 
 <style>
   .mini-menu{
@@ -163,7 +158,16 @@ select {
     background: #2980b9;
   }
 </style>
+<!-- MENU -->
+<div class="mini-menu">
+  <a href="index.html">Index</a>
+  <a href="cuadro.html">Cuadro</a>
+  <a href="teclado.html">Teclado</a>
+</div>
+
+<br>
 <h1 class="titulo">AbcZUL</h1>
+
 
 <div class="input-nombre">
   <input type="text" id="nombreUsuario" placeholder="Tu nombre">
@@ -181,6 +185,7 @@ select {
     <option value="numeros0">🔢 Números [0-9]</option>
 	<option value="numeros1">🔢 Números [0-20]</option>
     <option value="vocales">🅰️ Vocales</option>
+	<option value="letras">🅰️ Letras</option>
     <option value="cuerpo">👂 Cuerpo</option>
   </select>
    <button id="btnAudio" class="audioBtn">🔊</button>
@@ -243,6 +248,7 @@ function obtenerConjunto() {
   if (modo === "numeros0") return "0123456789".split("");
   if (modo === "numeros1") return "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20".split(",");
   if (modo === "cuerpo") return ["ceja","oido","nariz","ojo","boca","frente","lengua"];
+  if (modo === "letras") return "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("");
   return ["A","E","I","O","U"];
 }
 
