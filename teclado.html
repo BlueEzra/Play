@@ -2,133 +2,176 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<!-- MENU -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Teclado Responsive</title>
+
+<style>
+
+body{
+    font-family: Arial;
+    background:#f2f2f2;
+    margin-top:80px;
+}
+
+/* MENU */
+
+.mini-menu{
+    position:fixed;
+    top:10px;
+    right:10px;
+
+    display:flex;
+    gap:8px;
+
+    padding:6px 10px;
+
+    background:rgba(0,0,0,0.6);
+
+    border-radius:10px;
+
+    z-index:9999;
+}
+
+.mini-menu a{
+    text-decoration:none;
+    color:white;
+    background:#3498db;
+    padding:8px 12px;
+    border-radius:6px;
+}
+
+/* TITULO */
+
+h2{
+    text-align:center;
+}
+
+/* PANTALLA */
+
+#pantalla{
+    width:95%;
+    max-width:1000px;
+
+    height:80px;
+
+    margin:20px auto;
+
+    display:block;
+
+    text-align:center;
+
+    font-size:30px;
+
+    border-radius:10px;
+    border:2px solid #999;
+
+    box-shadow: inset 0 3px 6px rgba(0,0,0,0.2);
+}
+
+/* TECLADO */
+
+#teclado{
+    width:95%;
+    max-width:1000px;
+    margin:auto;
+}
+
+.fila{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin:6px 0;
+}
+
+button{
+
+    flex:1;
+
+    height:80px;
+
+    font-size:24px;
+
+    border:none;
+    border-radius:10px;
+
+    background:linear-gradient(#fff,#d9d9d9);
+
+    box-shadow:0 5px #666;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:0.1s;
+
+    touch-action: manipulation;
+
+    user-select:none;
+}
+
+button:active{
+    transform:translateY(4px);
+    box-shadow:0 1px #444;
+}
+
+/* ======================================
+   📱 VERTICAL
+====================================== */
+
+@media (orientation: portrait){
+
+    h2{
+        font-size:42px;
+    }
+
+    #pantalla{
+        height:120px;
+        font-size:50px;
+    }
+
+    /* cada fila se parte en 2 */
+    .fila{
+        flex-wrap:wrap;
+    }
+
+    button{
+        flex: 0 0 18%;
+        height:110px;
+        font-size:36px;
+    }
+
+    .mini-menu a{
+        font-size:20px;
+    }
+}
+
+/* ======================================
+   💻 HORIZONTAL
+====================================== */
+
+@media (orientation: landscape){
+
+    .fila{
+        flex-wrap:nowrap;
+    }
+
+    button{
+        height:80px;
+        font-size:24px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
 <div class="mini-menu">
   <a href="index.html">Index</a>
   <a href="cuadro.html">Cuadro</a>
   <a href="teclado.html">Teclado</a>
 </div>
-
-<br>
-<br>
-<br>
-<style>
-  .mini-menu{
-    position: fixed;
-    top: 10px;
-    right: 10px;
-
-    display: flex;
-    gap: 8px;
-
-    padding: 6px 10px;
-    background: rgba(0,0,0,0.6);
-    border-radius: 10px;
-
-    z-index: 9999;
-    font-family: Arial, sans-serif;
-  }
-
-  .mini-menu a{
-    text-decoration: none;
-    color: white;
-    background: #3498db;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    transition: 0.2s;
-  }
-
-  .mini-menu a:hover{
-    background: #2980b9;
-  }
-</style>
-<title>Teclado con Array</title>
-
-<style>
-    body {
-        font-family: Arial;
-        margin-top: 30px;
-        background: #f2f2f2;
-    }
-
-    h2 {
-        text-align: center;
-    }
-
-	#pantalla {
-		width: 100%;
-		max-width: 1000px;   /* 👈 mismo ancho que el teclado */
-		height: 80px;        /* 👈 más equilibrado */
-		font-size: 28px;
-		margin: 20px auto;
-		display: block;
-		text-align: center;
-
-		border-radius: 10px;
-		border: 2px solid #999;
-		background: white;
-
-		box-shadow: inset 0 3px 6px rgba(0,0,0,0.2);
-
-		letter-spacing: 2px;
-	}
-
-    #teclado {
-        width: 100%;
-        max-width: 1000px;
-        margin: auto;
-    }
-
-    .fila {
-        display: flex;
-        justify-content: center;
-        gap: 6px;
-        margin: 6px;
-    }
-
-    button {
-        flex: 1;
-        height: 80px;
-        font-size: 20px;
-        margin: 2px;
-        cursor: pointer;
-  touch-action: manipulation;
-
-        /* estilo tipo tecla */
-        background: linear-gradient(#ffffff, #d9d9d9);
-        border: 2px solid #999;
-        border-radius: 8px;
-        box-shadow: 0 5px #666;
-        transition: all 0.1s ease;
-        font-weight: bold;
-        user-select: none;
-    }
-
-    button:hover {
-        background: linear-gradient(#fefefe, #cfcfcf);
-    }
-
-    button:active {
-        transform: translateY(4px);
-        box-shadow: 0 1px #444;
-    }
-
-    .especial {
-        background: linear-gradient(red, darkred);
-        color: white;
-        border: 2px solid #800;
-    }
-
-    .leer {
-        background: linear-gradient(green, darkgreen);
-        color: white;
-        border: 2px solid #060;
-    }
-</style>
-
-</head>
-<body>
 
 <h2>Teclado</h2>
 
@@ -137,48 +180,75 @@
 <div id="teclado"></div>
 
 <script>
-    const letras = [
-        ["Q","W","E","R","T","Y","U","I","O","P"],
-        ["A","S","D","F","G","H","J","K","L","Ñ"],
-        ["Z","X","C","V","B","N","M"],
-        ["Limpiar,🧹","Espacio,␣␣␣␣␣␣␣␣","Eliminar,⌫","Leer,🔊"]
-    ];
 
-    const contenedor = document.getElementById("teclado");
+const letras = [
 
-    letras.forEach(fila => {
-        const divFila = document.createElement("div");
-        divFila.className = "fila";
-        fila.forEach(letra => {
-            const btn = document.createElement("button");
-			if (letra.includes(",")) 
-				btn.textContent = letra.split(",")[1];
-			else
-				btn.textContent = letra;
-            btn.onclick = () => agregar(letra);
-            divFila.appendChild(btn);
-        });
-        contenedor.appendChild(divFila);
+    ["Q","W","E","R","T","Y","U","I","O","P"],
+
+    ["A","S","D","F","G","H","J","K","L","Ñ"],
+
+    ["Z","X","C","V","B","N","M"],
+
+    ["Limpiar,🧹","Espacio,␣","Eliminar,⌫","Leer,🔊"]
+];
+
+const contenedor = document.getElementById("teclado");
+
+letras.forEach(fila => {
+
+    const divFila = document.createElement("div");
+
+    divFila.className = "fila";
+
+    fila.forEach(letra => {
+
+        const btn = document.createElement("button");
+
+        if(letra.includes(",")){
+            btn.textContent = letra.split(",")[1];
+        }else{
+            btn.textContent = letra;
+        }
+
+        btn.onclick = () => agregar(letra);
+
+        divFila.appendChild(btn);
     });
 
-    function agregar(letra) {
-        if(letra.split(",")[0]=="Limpiar"){
-            document.getElementById("pantalla").value ="";
-            return
-        }
-        if(letra.split(",")[0]=="Eliminar"){
-            document.getElementById("pantalla").value =  document.getElementById("pantalla").value.slice(0, -1);
-            return;
-        }
-        if(letra.split(",")[0]=="Leer"){
-            const voz = new SpeechSynthesisUtterance(document.getElementById("pantalla").value);
-            voz.lang = "es-ES";
-            speechSynthesis.speak(voz);
-            return;
-        }
-        letra = (letra.split(",")[0] === "Espacio") ? " " : letra;
-        document.getElementById("pantalla").value += letra;
+    contenedor.appendChild(divFila);
+});
+
+function agregar(letra){
+
+    const pantalla = document.getElementById("pantalla");
+
+    if(letra.split(",")[0] == "Limpiar"){
+        pantalla.value = "";
+        return;
     }
+
+    if(letra.split(",")[0] == "Eliminar"){
+        pantalla.value = pantalla.value.slice(0,-1);
+        return;
+    }
+
+    if(letra.split(",")[0] == "Leer"){
+
+        const voz = new SpeechSynthesisUtterance(pantalla.value);
+
+        voz.lang = "es-ES";
+
+        speechSynthesis.speak(voz);
+
+        return;
+    }
+
+    letra = (letra.split(",")[0] == "Espacio") ? " " : letra;
+
+    pantalla.value += letra;
+}
+
 </script>
+
 </body>
 </html>
