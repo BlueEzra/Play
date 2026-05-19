@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+<div class="mini-menu">
+  <a href="index.html">Index</a>
+  <a href="cuadro.html">Cuadro</a>
+  <a href="teclado.html">Teclado</a>
+    <a href="piano.html">Piano</a>
+</div>
+
+
+<title>Notas Musicales UNO</title>
+  <!-- MENU -->
+
+
+<style>
+body{
+  margin:0;
+  padding:20px;
+  background:#f0f0f0;
+  font-family:Arial;
+  text-align:center;
+}
+
+h1{ color:#333; }
+
+textarea{
+  width:80%;
+  height:90px;
+  font-size:20px;
+  padding:10px;
+  border-radius:10px;
+  border:2px solid #999;
+}
+
+button{
+  margin:10px;
+  padding:12px 20px;
+  border:none;
+  border-radius:12px;
+  background:#ff3b3b;
+  color:white;
+  font-size:18px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#d90000;
+}
+
+select{
+  padding:10px;
+  font-size:18px;
+  border-radius:10px;
+  margin:10px;
+}
+
+.contenedor{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin-top:30px;
+}
+
+.carta{
+  width:240px;
+  height:340px;
+  border-radius:25px;
+  background:white;
+  border:6px solid #ddd;
+  box-shadow:0 6px 15px rgba(0,0,0,0.3);
+  position:relative;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  font-size:48px;
+  font-weight:bold;
+}
+
+.esquina{
+  position:absolute;
+  font-size:26px;
+  color:#444;
+}
+
+.arriba{ top:12px; left:12px; }
+.abajo{ bottom:12px; right:12px; transform:rotate(180deg); }
+
+.carta img{
+  width:180px;
+  height:180px;
+  object-fit:contain;
+  margin-bottom:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🎵 Cartas de Notas Musicales 🎵</h1>
+
+<textarea id="entrada">DO , RE , MI , FA</textarea>
+
+<br>
+
+<label><b>Tiempo:</b></label>
+<select id="tiempo">
+  <option value="3000">3 segundos</option>
+  <option value="5000" selected>5 segundos</option>
+  <option value="7000">7 segundos</option>
+</select>
+
+<label><b>Playlist:</b></label>
+<select id="cancion" onchange="cambiarCancion()">
+  <option value="manual">✏ Manual</option>
+</select>
+
+<button onclick="iniciar()">▶ Iniciar</button>
+<button onclick="detener()">⏹ Detener</button>
+
+<div class="contenedor" id="contenedor"></div>
+
+<script>
+
+/////////////////////////////////////////////////
+// PLAYLIST
+/////////////////////////////////////////////////
+
+const playlist = [
+  {
+    nombre: "HIMNO A LA ALEGRIA",
+    notas: "SI,DO,RE,RE,DO,SI,LA,SOL,SOL,LA,SI,SI,LA,LA,SI,DO6,RE6,DO6,SI,LA,SOL,SOL,LA,SI,LA,SOL,SOL,LA,SI,SOL,LA,SI,DO6,SI,SOL,LA,SI,DO6,SI,LA,SOL,LA,RE,SI,DO6,RE6,RE6,DO6,SI,LA,SOL,SOL,LA,SI,LA,SOL,SOL,"
+  },
+  {
+    nombre: "YO SOY TU AMIGO FIEL",
+    notas: "MI,SOL,MI,LA,SOL,MI,LA,DO6,LA,RE6,DO5,SOL,LA,LA,LA,LA,SOL,SI,SI,SI,DO6,LA,SI,SI,SI,DO6,LA,MI,SOL,RE,RE,MI,DO6,LA,SOL,DO6,DO6,DO6,DO6,LA,SOL,DO6,DO6,DO6,"
+  }
+];
+  
+/////////////////////////////////////////////////
+// DICCIONARIO
+/////////////////////////////////////////////////
+
+const diccionario = {
+  DO:{nombre:"DO",imagen:"imagenes/piano/doctora.jpg"},
+  RE:{nombre:"RE",imagen:"imagenes/piano/regalo.jpg"},
+  MI:{nombre:"MI",imagen:"imagenes/piano/mimi.jpg"},
+  FA:{nombre:"FA",imagen:"imagenes/piano/fantasma.jpg"},
+  SOL:{nombre:"SOL",imagen:"imagenes/piano/sol.jpg"},
+  LA:{nombre:"LA",imagen:"imagenes/piano/lapiz.jpg"},
+  SI:{nombre:"SI",imagen:"imagenes/piano/sirena.jpg"}
+};
+
+/////////////////////////////////////////////////
+
+let notas=[];
+let indice=0;
+let intervalo=null;
+
+/////////////////////////////////////////////////
+// CARGAR PLAYLIST
+/////////////////////////////////////////////////
+
+function cargarPlaylist(){
+
+  const select = document.getElementById("cancion");
+
+  playlist.forEach((cancion, i)=>{
+
+    const option = document.createElement("option");
+
+    option.value = i;
+
+    option.textContent = cancion.nombre;
+
+    select.appendChild(option);
+
+  });
+}
+
+/////////////////////////////////////////////////
+// CAMBIAR CANCIÓN
+/////////////////////////////////////////////////
+
+function cambiarCancion(){
+
+  const val = document.getElementById("cancion").value;
+
+  if(val === "manual") return;
+
+  document.getElementById("entrada").value =
+    playlist[val].notas;
+}
+
+/////////////////////////////////////////////////
+// CONTROL
+/////////////////////////////////////////////////
+
+function iniciar(){
+
+  detener();
+
+  const texto = document.getElementById("entrada").value;
+
+  notas = texto.split(",").map(n => n.trim()).filter(n => n);
+
+  indice = 0;
+
+  if(notas.length === 0) return;
+
+  mostrar();
+
+  const tiempo =
+    parseInt(document.getElementById("tiempo").value);
+
+  intervalo = setInterval(()=>{
+
+    indice++;
+
+    if(indice >= notas.length){
+      detener();
+      return;
+    }
+
+    mostrar();
+
+  }, tiempo);
+}
+
+function detener(){
+  clearInterval(intervalo);
+}
+
+/////////////////////////////////////////////////
+// VOZ (SIN NÚMEROS)
+/////////////////////////////////////////////////
+
+function hablar(texto){
+
+  const limpio = texto.replace(/\d+/g, "");
+
+  speechSynthesis.cancel();
+
+  const voz = new SpeechSynthesisUtterance(limpio);
+
+  voz.lang = "es-ES";
+
+  speechSynthesis.speak(voz);
+}
+
+/////////////////////////////////////////////////
+// CARTA TIPO UNO
+/////////////////////////////////////////////////
+
+function crearCarta(clave){
+
+  const match = clave.match(/^([A-Z]+)(\d+)?$/);
+
+  let nota = clave;
+  let numero = "";
+
+  if(match){
+    nota = match[1];
+    numero = match[2] || "";
+  }
+
+  const carta = document.createElement("div");
+  carta.className = "carta";
+
+  carta.innerHTML = `
+    <div class="esquina arriba">${numero}</div>
+    <div class="esquina abajo">${numero}</div>
+    <div>${nota}</div>
+  `;
+
+  if(diccionario[nota] && diccionario[nota].imagen){
+
+    const img = document.createElement("img");
+    img.src = diccionario[nota].imagen;
+
+    img.onerror = ()=>img.remove();
+
+    carta.appendChild(img);
+  }
+
+  carta.onclick = ()=>hablar(nota);
+
+  return carta;
+}
+
+/////////////////////////////////////////////////
+// MOSTRAR
+/////////////////////////////////////////////////
+
+function mostrar(){
+
+  const cont = document.getElementById("contenedor");
+
+  cont.innerHTML = "";
+
+  const clave = notas[indice];
+
+  if(!clave) return;
+
+  cont.appendChild(crearCarta(clave));
+
+  hablar(clave);
+}
+
+/////////////////////////////////////////////////
+
+cargarPlaylist();
+
+</script>
+
+</body>
+</html>
