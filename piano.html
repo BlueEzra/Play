@@ -254,6 +254,23 @@ function hablar(texto){
 }
 
 /////////////////////////////////////////////////
+// OBTENER NOMBRE DE LA IMAGEN DESDE LA CLAVE
+/////////////////////////////////////////////////
+
+function obtenerTextoVoz(clave) {
+  const match = clave.match(/^([A-Z]+)(\d+)?$/);
+  const nota = match ? match[1] : clave;
+
+  if (diccionario[nota] && diccionario[nota].imagen) {
+    const ruta = diccionario[nota].imagen;
+    // Extrae el nombre del archivo quitando la ruta y la extensión
+    const nombreArchivo = ruta.substring(ruta.lastIndexOf('/') + 1, ruta.lastIndexOf('.'));
+    return nombreArchivo;
+  }
+  return nota;
+}
+
+/////////////////////////////////////////////////
 // CARTA TIPO UNO
 /////////////////////////////////////////////////
 
@@ -288,7 +305,7 @@ function crearCarta(clave){
     carta.appendChild(img);
   }
 
-  carta.onclick = ()=>hablar(nota);
+  carta.onclick = ()=>hablar(obtenerTextoVoz(clave));
 
   return carta;
 }
@@ -309,7 +326,7 @@ function mostrar(){
 
   cont.appendChild(crearCarta(clave));
 
-  hablar(clave);
+  hablar(obtenerTextoVoz(clave));
 }
 
 /////////////////////////////////////////////////
