@@ -4,257 +4,162 @@
 <meta charset="UTF-8">
 <title>AbcZUL - Juego Educativo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-:root {
-  --rojo: #e74c3c;
-  --verde: #2ecc71;
-  --amarillo: #f1c40f;
-  --azul: #3498db;
-}
-
-body {
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f7f6;
-  text-align: center;
-}
-
-.titulo {
-  font-size: 48px;
-  margin: 10px;
-}
-
-.layout {
-  display: flex;
-  justify-content: center;
-  padding: 20px;
-}
-
-.contenedor {
-  max-width: 600px;
-  width: 100%;
-}
-
-/* 🔥 BARRA */
-.torre-container {
-  display: grid;
-  gap: 4px;
-  background: #ddd;
-  height: 40px;
-  border-radius: 10px;
-  padding: 6px;
-  margin-bottom: 15px;
-}
-
-.disco {
-  width: 100%;
-  height: 100%;
-  border-radius: 3px;
-}
-
-.basico .disco { background: var(--verde); }
-.medio .disco { background: var(--amarillo); }
-.avanzado .disco { background: var(--rojo); }
-
-/* UI */
-.fila {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
-}
-
-select {
-  padding: 8px;
-  border-radius: 8px;
-}
-
-.audio-linea {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 10px;
-}
-
-.audioBtn {
-  font-size: 20px;
-  border-radius: 60%;
-  width: 40px;
-  height: 30px;
-}
-
-#mensaje {
-  font-size: 28px;
-  font-weight: bold;
-  min-width: 200px;
-}
-
-/* cartas */
-.cartas {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.carta {
-  width: 120px;
-  height: 160px;
-  background: white;
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 50px;
-  cursor: pointer;
-  border: 5px solid transparent;
-}
-
-.b-rojo { border-color: red; }
-.b-verde { border-color: green; }
-.b-azul { border-color: blue; }
-
-.carta img {
-  max-width: 100%;
-  max-height: 100%;
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-
-<style>
-  .mini-menu{
-    position: fixed;
-    top: 10px;
-    right: 10px;
-
-    display: flex;
-    gap: 8px;
-
-    padding: 6px 10px;
-    background: rgba(0,0,0,0.6);
-    border-radius: 10px;
-
-    z-index: 9999;
-    font-family: Arial, sans-serif;
-  }
-
-  .mini-menu a{
-    text-decoration: none;
-    color: white;
-    background: #3498db;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    transition: 0.2s;
-  }
-
-  .mini-menu a:hover{
-    background: #2980b9;
-  }
-</style>
-  <!-- MENU -->
+<!-- MENU -->
 <div class="mini-menu">
   <a href="index.html">Index</a>
   <a href="cuadro.html">Cuadro</a>
   <a href="teclado.html">Teclado</a>
-    <a href="piano.html">Piano</a>
+  <a href="piano.html">Piano</a>
 </div>
 
-
-<br>
-<br>
-<br>
 <h1 class="titulo">AbcZUL.</h1>
 
-
 <div class="input-nombre">
-  <input type="text" id="nombreUsuario" placeholder="Tu nombre">
+  <input type="text" id="nombreUsuario" placeholder="Escribe tu nombre">
 </div>
 
 <div class="layout">
 <div class="contenedor">
 
-<div id="torre" class="torre-container"></div>
+  <!-- TORRE -->
+  <div id="torre" class="torre-container"></div>
 
-<div class="fila">
-  <span>Modo</span>
+  <!-- CONTROLES -->
+  <div class="fila">
+    <span>Modo</span>
+    <select id="modo"></select>
+    <button id="btnAudio" class="audioBtn">🔊</button>
+  </div>
 
-  <select id="modo">
-    <option value="numeros0">🔢 Números [0-9]</option>
-	<option value="numeros1">🔢 Números [0-20]</option>
-    <option value="vocales">🅰️ Vocales</option>
-	<option value="letras">🅰️ Letras</option>
-    <option value="cuerpo">👂 Cuerpo</option>
-  </select>
-   <button id="btnAudio" class="audioBtn">🔊</button>
-   
+  <!-- CARTAS -->
+  <div class="cartas" id="cartas"></div>
 
-<!--
-  <select id="dificultad">
-    <option value="4">Básico</option>
-    <option value="7">Medio</option>
-    <option value="10">Avanzado</option>
-  </select>
--->
-</div>
-<!--
-<div class="audio-linea">
-
-  <button id="btnAudio" class="audioBtn">🔊</button>
+  <br>
   <div id="mensaje">-</div>
-</div>
--->
-<div class="cartas" id="cartas"></div>
-<br>
-   <div id="mensaje"  >-</div>
+
 </div>
 </div>
 
 <script>
+
+// =====================================================
+// CONFIGURACIÓN DE MODOS
+// =====================================================
+
+const MODOS = {
+  numeros0: {    nombre: "🔢 Números Nivel 1 [0-9]",   
+                  datos: "0123456789".split("")  },
+  numeros1: {    nombre: "🔢 Números Nivel 2 [0-20]",
+                  datos: "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20".split(",")  },
+  numeros2: {    nombre: "🔢 Números Nivel 3 [0-100]",
+                  datos: "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100".split(",")  },				  
+  vocales: {    nombre: "🅰️ Vocales",
+                 datos: ["A","E","I","O","U"]  },
+  letras: {    nombre: "🅰️ Letras",
+                datos: [..."ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"]  },
+  silabas: {    nombre: "🔤 Silabas",
+                 datos: "ma,me,mi,mo,mu,pa,pe,pi,po,pu,la,le,li,lo,lu,sa,se,si,so,su,ta,te,ti,to,tu,na,ne,ni,no,nu,da,de,di,do,du,ca,ce,ci,co,cu,ba,be,bi,bo,bu,fa,fe,fi,fo,fu,ga,ge,gi,go,gu,ja,je,ji,jo,ju,ra,re,ri,ro,ru".split(",")  },
+  cuerpo: {    nombre: "👂 Cuerpo",
+                datos: ["ceja","oido","nariz","ojo","boca","frente","lengua"]
+  }
+};
+
+
+// =====================================================
+// VARIABLES
+// =====================================================
+
 let nivel = 0;
 let objetivoActual = "";
 let bloqueado = false;
-
 let MAX_NIVEL = 10;
 let dificultadClase = "basico";
 
 const colores = ["b-rojo","b-verde","b-azul"];
+
+
+// =====================================================
+// VOZ
+// =====================================================
 
 function hablar(texto) {
   speechSynthesis.cancel();
   speechSynthesis.speak(new SpeechSynthesisUtterance(texto));
 }
 
-/* 🔥 BARRA */
+
+// =====================================================
+// CARGAR MODOS
+// =====================================================
+
+function cargarModos() {
+  const select = document.getElementById("modo");
+  select.innerHTML = "";
+
+  Object.entries(MODOS).forEach(([id, modo]) => {
+    const option = document.createElement("option");
+    option.value = id;
+    option.textContent = modo.nombre;
+    select.appendChild(option);
+  });
+}
+
+
+// =====================================================
+// OBTENER MODO ACTUAL
+// =====================================================
+
+function obtenerModo() {
+  return MODOS[document.getElementById("modo").value];
+}
+
+function obtenerConjunto() {
+  return obtenerModo().datos;
+}
+
+
+// =====================================================
+// TORRE
+// =====================================================
+
 function actualizarTorre() {
   const torre = document.getElementById("torre");
   torre.innerHTML = "";
-
-  torre.style.gridTemplateColumns = `repeat(${MAX_NIVEL}, 1fr)`;
+  torre.style.gridTemplateColumns = `repeat(${MAX_NIVEL},1fr)`;
   torre.className = "torre-container " + dificultadClase;
 
   for (let i = 1; i <= MAX_NIVEL; i++) {
-    const d = document.createElement("div");
-    if (i <= nivel) d.className = "disco";
-    torre.appendChild(d);
+    const disco = document.createElement("div");
+    if (i <= nivel) disco.className = "disco";
+    torre.appendChild(disco);
   }
 }
 
-/* conjunto */
-function obtenerConjunto() {
-  const modo = document.getElementById("modo").value;
-  if (modo === "numeros0") return "0123456789".split("");
-  if (modo === "numeros1") return "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20".split(",");
-  if (modo === "cuerpo") return ["ceja","oido","nariz","ojo","boca","frente","lengua"];
-  if (modo === "letras") return "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("");
-  return ["A","E","I","O","U"];
+
+// =====================================================
+// MEZCLAR ARRAY
+// =====================================================
+
+function mezclar(array) {
+  const copia = [...array];
+
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+
+  return copia;
 }
+
+
+// =====================================================
+// NUEVO JUEGO
+// =====================================================
 
 function nuevoJuego() {
   bloqueado = false;
@@ -267,66 +172,81 @@ function nuevoJuego() {
 
   actualizarTorre();
 
-  const datos = obtenerConjunto();
-  objetivoActual = datos[Math.floor(Math.random()*datos.length)];
+  const modo = obtenerModo();
+  const datos = modo.datos;
 
-  let opciones = datos.filter(x=>x!==objetivoActual);
-  opciones.sort(()=>Math.random()-0.5);
+  // Elegir objetivo
+  objetivoActual = datos[Math.floor(Math.random() * datos.length)];
 
-  let finales = [objetivoActual, opciones[0], opciones[1]];
-  finales.sort(()=>Math.random()-0.5);
+  // Elegir opciones incorrectas
+  let opciones = datos.filter(x => x !== objetivoActual);
+  opciones = mezclar(opciones);
+
+  // Crear las tres cartas
+  let finales = mezclar([
+    objetivoActual,
+    opciones[0],
+    opciones[1]
+  ]);
 
   hablar("Aprieta " + objetivoActual);
 
-  /* 🔥 CARTAS CON IMAGEN O TEXTO */
-  finales.forEach((val,i)=>{
+  // Crear cartas
+  finales.forEach((valor, indice) => {
     const div = document.createElement("div");
-    div.className = "carta " + colores[i];
+    div.className = "carta " + colores[indice];
 
     const img = new Image();
-  //  img.src = `./imagenes/${val}.jpg`;
-  const categoria=document.getElementById("modo").value;
-  console.log(categoria);
-    img.src = `imagenes/juego/${categoria}/${val}.jpg`;
-	console.log(img.src);
+    const categoria = document.getElementById("modo").value;
+
+    img.src = `imagenes/juego/${categoria}/${valor}.jpg`;
+
+    // Si existe imagen
     img.onload = () => {
       div.innerHTML = "";
       div.appendChild(img);
     };
 
+    // Si no existe imagen, mostrar texto
     img.onerror = () => {
-      div.innerHTML = val;
+      div.innerHTML = valor;
     };
 
-    div.onclick = ()=>{
-
+    // Click de carta
+    div.onclick = () => {
       if (bloqueado) return;
 
-      if (val === objetivoActual) {
+      // RESPUESTA CORRECTA
+      if (valor === objetivoActual) {
         bloqueado = true;
         nivel++;
         actualizarTorre();
 
+        // NIVEL FINAL
         if (nivel >= MAX_NIVEL) {
-          const nombre = document.getElementById("nombreUsuario").value || "";
-          const texto = nombre ? `¡Felicidades ${nombre}!` : "¡FELICIDADES!";
+          const nombre = document.getElementById("nombreUsuario").value.trim();
+          const texto = nombre
+            ? `¡Felicidades ${nombre}!`
+            : "¡FELICIDADES!";
 
           mensaje.innerText = "✔️ " + texto;
           hablar(texto);
 
-          setTimeout(()=>{
+          setTimeout(() => {
             nivel = 0;
             actualizarTorre();
             nuevoJuego();
-          },2500);
+          }, 2500);
 
+        // SIGUIENTE NIVEL
         } else {
           mensaje.innerText = "✔️";
           setTimeout(nuevoJuego, 800);
         }
 
+      // RESPUESTA INCORRECTA
       } else {
-	   hablar("Intentalo de nuevo " );
+        hablar("Intentalo de nuevo");
         mensaje.innerText = "❌";
       }
     };
@@ -335,31 +255,31 @@ function nuevoJuego() {
   });
 }
 
-/* dificultad */
-/*
-document.getElementById("dificultad").onchange = (e)=>{
-  const val = parseInt(e.target.value);
-  MAX_NIVEL = val;
 
-  if (val === 4) dificultadClase = "basico";
-  else if (val === 7) dificultadClase = "medio";
-  else dificultadClase = "avanzado";
+// =====================================================
+// EVENTOS
+// =====================================================
 
-  nivel = 0;
-  nuevoJuego();
-};
-*/
-document.getElementById("modo").onchange = ()=>{
+document.getElementById("modo").onchange = () => {
   nivel = 0;
   nuevoJuego();
 };
 
-document.getElementById("btnAudio").onclick = ()=>{
+document.getElementById("btnAudio").onclick = () => {
   hablar("Aprieta " + objetivoActual);
 };
 
-window.onload = nuevoJuego;
-</script>
 
+// =====================================================
+// INICIO
+// =====================================================
+
+window.onload = () => {
+  cargarModos();
+  nuevoJuego();
+};
+
+</script>
 </body>
 </html>
+
