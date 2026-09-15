@@ -5,10 +5,13 @@
   --azul: #3498db;
 }
 
-
 /* =========================
    GENERAL
 ========================= */
+
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -16,7 +19,6 @@ body {
   background: #f4f7f6;
   text-align: center;
 }
-
 
 /* =========================
    TITULO
@@ -27,7 +29,6 @@ body {
   margin: 10px;
 }
 
-
 /* =========================
    LAYOUT
 ========================= */
@@ -35,14 +36,13 @@ body {
 .layout {
   display: flex;
   justify-content: center;
-  padding: 20px;
+  padding: 10px;
 }
 
 .contenedor {
-  max-width: 600px;
+  max-width: 1200px;
   width: 100%;
 }
-
 
 /* =========================
    UI
@@ -63,28 +63,26 @@ select {
   font-size: 16px;
 }
 
-
 /* =========================
    CUADRICULA
 ========================= */
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(6, 150px);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 10px;
-  justify-content: center;
+  width: 100%;
   margin-top: 20px;
 }
-
 
 /* =========================
    CELDAS
 ========================= */
 
 .cell {
+  width: 100%;
+  aspect-ratio: 1 / 1;
   border: 1px solid #ccc;
-  width: 150px;
-  height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,11 +95,11 @@ select {
 }
 
 .cell img {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
-
 
 /* =========================
    PANTALLA VERTICAL
@@ -109,10 +107,33 @@ select {
 
 @media (orientation: portrait) {
   .grid {
-    grid-template-columns: repeat(4, 150px);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
+/* =========================
+   PANTALLAS PEQUEÑAS
+========================= */
+
+@media (max-width: 600px) {
+  .titulo {
+    font-size: 28px;
+  }
+
+  .layout {
+    padding: 5px;
+  }
+
+  .grid {
+    gap: 5px;
+    margin-top: 10px;
+  }
+
+  .cell {
+    border-radius: 6px;
+    font-size: 12px;
+  }
+}
 
 /* =========================
    MINI MENU
