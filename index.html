@@ -1,285 +1,108 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>AbcZUL - Juego Educativo</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuadro de comunicación</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- MENU -->
-<div class="mini-menu">
-  <a href="index.html">Index</a>
-  <a href="cuadro.html">Cuadro</a>
-  <a href="teclado.html">Teclado</a>
-  <a href="piano.html">Piano</a>
-</div>
+  <h1 class="titulo">Cuadro de comunicación</h1>
 
-<h1 class="titulo">AbcZUL.</h1>
-
-<div class="input-nombre">
-  <input type="text" id="nombreUsuario" placeholder="Escribe tu nombre">
-</div>
-
-<div class="layout">
-<div class="contenedor">
-
-  <!-- TORRE -->
-  <div id="torre" class="torre-container"></div>
-
-  <!-- CONTROLES -->
   <div class="fila">
-    <span>Modo</span>
-    <select id="modo"></select>
-    <button id="btnAudio" class="audioBtn">🔊</button>
+    <label for="categoria">Tipo:</label>
+    <select id="categoria"></select>
   </div>
 
-  <!-- CARTAS -->
-  <div class="cartas" id="cartas"></div>
+  <div class="grid" id="grid"></div>
 
-  <br>
-  <div id="mensaje">-</div>
+  <script>
 
-</div>
-</div>
+    const datos = {
+      comidas: {
+        nombre: "Comida",
+        modo: "Quiero",
+        elementos: ["agua","sandia","fresa","huevo","pollo","leche","tomate","aguacate",
+		            "agua","sandia","fresa","huevo","pollo","leche","tomate","aguacate"]
+      },
 
-<script>
-
-// =====================================================
-// CONFIGURACIÓN DE MODOS
-// =====================================================
-
-const MODOS = {
-  numeros0: {    nombre: "🔢 Números Nivel 1 [0-9]",   
-                  datos: "0123456789".split("")  },
-  numeros1: {    nombre: "🔢 Números Nivel 2 [0-20]",
-                  datos: "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20".split(",")  },
-  numeros2: {    nombre: "🔢 Números Nivel 3 [0-100]",
-                  datos: "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100".split(",")  },				  
-  vocales: {    nombre: "🅰️ Vocales",
-                 datos: ["A","E","I","O","U"]  },
-  letras: {    nombre: "🅰️ Letras",
-                datos: [..."ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"]  },
-  silabas: {    nombre: "🔤 Silabas",
-                 datos: "ma,me,mi,mo,mu,pa,pe,pi,po,pu,la,le,li,lo,lu,sa,se,si,so,su,ta,te,ti,to,tu,na,ne,ni,no,nu,da,de,di,do,du,ca,ce,ci,co,cu,ba,be,bi,bo,bu,fa,fe,fi,fo,fu,ga,ge,gi,go,gu,ja,je,ji,jo,ju,ra,re,ri,ro,ru".split(",")  },
-  cuerpo: {    nombre: "👂 Cuerpo",
-                datos: ["ceja","oido","nariz","ojo","boca","frente","lengua"]
-  }
-};
+      actividades: {
+        nombre: "Actividades",
+        modo: "Me gustaria",
+        elementos: ["jugar","leer","ver_tv","dormir"]
+      },
 
 
-// =====================================================
-// VARIABLES
-// =====================================================
-
-let nivel = 0;
-let objetivoActual = "";
-let bloqueado = false;
-let MAX_NIVEL = 10;
-let dificultadClase = "basico";
-
-const colores = ["b-rojo","b-verde","b-azul"];
-
-
-// =====================================================
-// VOZ
-// =====================================================
-
-function hablar(texto) {
-  speechSynthesis.cancel();
-  speechSynthesis.speak(new SpeechSynthesisUtterance(texto));
-}
-
-
-// =====================================================
-// CARGAR MODOS
-// =====================================================
-
-function cargarModos() {
-  const select = document.getElementById("modo");
-  select.innerHTML = "";
-
-  Object.entries(MODOS).forEach(([id, modo]) => {
-    const option = document.createElement("option");
-    option.value = id;
-    option.textContent = modo.nombre;
-    select.appendChild(option);
-  });
-}
-
-
-// =====================================================
-// OBTENER MODO ACTUAL
-// =====================================================
-
-function obtenerModo() {
-  return MODOS[document.getElementById("modo").value];
-}
-
-function obtenerConjunto() {
-  return obtenerModo().datos;
-}
-
-
-// =====================================================
-// TORRE
-// =====================================================
-
-function actualizarTorre() {
-  const torre = document.getElementById("torre");
-  torre.innerHTML = "";
-  torre.style.gridTemplateColumns = `repeat(${MAX_NIVEL},1fr)`;
-  torre.className = "torre-container " + dificultadClase;
-
-  for (let i = 1; i <= MAX_NIVEL; i++) {
-    const disco = document.createElement("div");
-    if (i <= nivel) disco.className = "disco";
-    torre.appendChild(disco);
-  }
-}
-
-
-// =====================================================
-// MEZCLAR ARRAY
-// =====================================================
-
-function mezclar(array) {
-  const copia = [...array];
-
-  for (let i = copia.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copia[i], copia[j]] = [copia[j], copia[i]];
-  }
-
-  return copia;
-}
-
-
-// =====================================================
-// NUEVO JUEGO
-// =====================================================
-
-function nuevoJuego() {
-  bloqueado = false;
-
-  const cartas = document.getElementById("cartas");
-  const mensaje = document.getElementById("mensaje");
-
-  cartas.innerHTML = "";
-  mensaje.innerText = "";
-
-  actualizarTorre();
-
-  const modo = obtenerModo();
-  const datos = modo.datos;
-
-  // Elegir objetivo
-  objetivoActual = datos[Math.floor(Math.random() * datos.length)];
-
-  // Elegir opciones incorrectas
-  let opciones = datos.filter(x => x !== objetivoActual);
-  opciones = mezclar(opciones);
-
-  // Crear las tres cartas
-  let finales = mezclar([
-    objetivoActual,
-    opciones[0],
-    opciones[1]
-  ]);
-
-  hablar("Aprieta " + objetivoActual);
-
-  // Crear cartas
-  finales.forEach((valor, indice) => {
-    const div = document.createElement("div");
-    div.className = "carta " + colores[indice];
-
-    const img = new Image();
-    const categoria = document.getElementById("modo").value;
-
-    img.src = `imagenes/juego/${categoria}/${valor}.jpg`;
-
-    // Si existe imagen
-    img.onload = () => {
-      div.innerHTML = "";
-      div.appendChild(img);
-    };
-
-    // Si no existe imagen, mostrar texto
-    img.onerror = () => {
-      div.innerHTML = valor;
-    };
-
-    // Click de carta
-    div.onclick = () => {
-      if (bloqueado) return;
-
-      // RESPUESTA CORRECTA
-      if (valor === objetivoActual) {
-        bloqueado = true;
-        nivel++;
-        actualizarTorre();
-
-        // NIVEL FINAL
-        if (nivel >= MAX_NIVEL) {
-          const nombre = document.getElementById("nombreUsuario").value.trim();
-          const texto = nombre
-            ? `¡Felicidades ${nombre}!`
-            : "¡FELICIDADES!";
-
-          mensaje.innerText = "✔️ " + texto;
-          hablar(texto);
-
-          setTimeout(() => {
-            nivel = 0;
-            actualizarTorre();
-            nuevoJuego();
-          }, 2500);
-
-        // SIGUIENTE NIVEL
-        } else {
-          mensaje.innerText = "✔️";
-          setTimeout(nuevoJuego, 800);
-        }
-
-      // RESPUESTA INCORRECTA
-      } else {
-        hablar("Intentalo de nuevo");
-        mensaje.innerText = "❌";
+      sentimientos: {
+        nombre: "Sentimientos",
+        modo: "Me siento",
+        elementos: ["feliz","enfermo","enojado","cansado"]
       }
     };
 
-    cartas.appendChild(div);
-  });
-}
+    const grid = document.getElementById("grid");
 
+    const selectCategoria = document.getElementById("categoria");
 
-// =====================================================
-// EVENTOS
-// =====================================================
+    function cargarCategorias() {
+      selectCategoria.innerHTML = "";
+      Object.entries(datos).forEach(([clave, categoria]) => {
+        const option = document.createElement("option");
+        option.value = clave;
+        option.textContent = categoria.nombre;
+        selectCategoria.appendChild(option);
+      });
+    }
 
-document.getElementById("modo").onchange = () => {
-  nivel = 0;
-  nuevoJuego();
-};
+    function render(categoria) {
+      grid.innerHTML = "";
+      const datosCategoria = datos[categoria];
+      const elementos = datosCategoria.elementos;
+      const modo = datosCategoria.modo;
+      elementos.forEach(elemento => {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        const img = document.createElement("img");
+        img.src = `./imagenes/cuadro/${categoria}/${elemento}.jpg`;
+        img.alt = elemento;
+        img.onerror = () => {
+          cell.innerHTML = "";
+          cell.textContent = obtenerTexto(elemento).toUpperCase();
+        };
+        img.onload = () => {
+          cell.innerHTML = "";
+          cell.appendChild(img);
+        };
 
-document.getElementById("btnAudio").onclick = () => {
-  hablar("Aprieta " + objetivoActual);
-};
+        cell.appendChild(img);
 
+        cell.addEventListener("click", () => {
+          const textoElemento = obtenerTexto(elemento);
+          const frase = `${modo} ${textoElemento}`;
+          hablar(frase);
+        });
 
-// =====================================================
-// INICIO
-// =====================================================
+        grid.appendChild(cell);
+      });
+    }
 
-window.onload = () => {
-  cargarModos();
-  nuevoJuego();
-};
+    function obtenerTexto(texto) {      return texto.replaceAll("_", " ");    }
 
-</script>
+    selectCategoria.addEventListener("change", () => {      render(selectCategoria.value);    });
+
+    function hablar(texto) {
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(texto);
+      utterance.lang = "es-ES";
+      utterance.rate = 0.9;
+      speechSynthesis.speak(utterance);
+    }
+
+    cargarCategorias();
+    selectCategoria.value = Object.keys(datos)[0];
+    render(selectCategoria.value);
+  </script>
 </body>
 </html>
-
