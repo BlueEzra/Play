@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Teclado Responsive</title>
+
+<!-- MENU -->
+
+  <!-- MENU -->
+
+<br>
+<style>
+
+/* ======================================
+   GENERAL
+====================================== */
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:Arial;
+
+    background:#f2f2f2;
+
+    margin:0;
+    padding:0;
+
+    overflow:hidden;
+}
+
+/* ======================================
+   MENU
+====================================== */
+
+.mini-menu{
+
+    position:fixed;
+
+    top:5px;
+    right:5px;
+
+    display:flex;
+
+    gap:5px;
+
+    padding:5px 8px;
+
+    background:rgba(0,0,0,0.6);
+
+    border-radius:10px;
+
+    z-index:9999;
+}
+
+.mini-menu a{
+
+    text-decoration:none;
+
+    color:white;
+
+    background:#3498db;
+
+    padding:5px 8px;
+
+    border-radius:6px;
+
+    font-size:12px;
+}
+
+/* ======================================
+   TITULO
+====================================== */
+
+h2{
+
+    text-align:center;
+
+    margin:5px 0;
+
+    font-size:24px;
+}
+
+/* ======================================
+   PANTALLA
+====================================== */
+
+#pantalla{
+
+    width:98%;
+
+    max-width:1400px;
+
+    height:70px;
+
+    margin:5px auto 2px auto;
+
+    display:block;
+
+    text-align:center;
+
+    font-size:32px;
+
+    font-weight:bold;
+
+    border-radius:12px;
+
+    border:2px solid #999;
+
+    background:white;
+
+    box-shadow:
+        inset 0 3px 6px rgba(0,0,0,0.2),
+        0 2px 4px rgba(0,0,0,0.15);
+
+    letter-spacing:2px;
+
+    padding:5px 10px;
+
+    outline:none;
+}
+
+/* ======================================
+   TECLADO
+====================================== */
+
+#teclado{
+
+    width:99vw;
+
+    margin:auto;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:flex-start;
+}
+
+/* ======================================
+   FILAS
+====================================== */
+
+.fila{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:4px;
+
+    margin:2px 0;
+
+    width:100%;
+}
+
+/* ======================================
+   BOTONES
+====================================== */
+
+button{
+
+    flex:1;
+
+    min-width:0;
+
+    height:40px;
+
+    font-size:20px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:linear-gradient(#fff,#d9d9d9);
+
+    box-shadow:0 3px #666;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:0.1s;
+
+    touch-action:manipulation;
+
+    user-select:none;
+
+    overflow:hidden;
+}
+
+button:active{
+
+    transform:translateY(2px);
+
+    box-shadow:0 1px #444;
+}
+
+/* ======================================
+   📱 MOBILE / VERTICAL
+====================================== */
+
+@media (orientation: portrait){
+
+    h2{
+        font-size:30px;
+    }
+
+    #pantalla{
+
+        height:80px;
+
+        font-size:38px;
+    }
+
+    /* DIVIDIR FILAS */
+
+    .fila{
+
+        flex-wrap:wrap;
+    }
+
+    button{
+
+        flex:0 0 18%;
+
+        height:55px;
+
+        font-size:28px;
+    }
+
+    .mini-menu a{
+
+        font-size:16px;
+    }
+}
+
+/* ======================================
+   💻 HORIZONTAL NORMAL
+====================================== */
+
+@media (orientation: landscape){
+
+    .fila{
+
+        flex-wrap:nowrap;
+    }
+
+    button{
+
+        height:40px;
+
+        font-size:20px;
+    }
+}
+
+/* ======================================
+   🖥️ PC GRANDE
+====================================== */
+
+@media screen and (min-width:1000px){
+
+    body{
+
+        padding:10px;
+    }
+
+    h2{
+
+        font-size:42px;
+
+        margin-bottom:10px;
+    }
+
+    #pantalla{
+
+        height:110px;
+
+        font-size:52px;
+
+        border-radius:16px;
+
+        margin-bottom:4px;
+    }
+
+    #teclado{
+
+        max-width:1400px;
+    }
+
+    .fila{
+
+        gap:10px;
+
+        margin:4px 0;
+    }
+
+    button{
+
+        height:80px;
+
+        font-size:34px;
+
+        border-radius:14px;
+
+        box-shadow:0 5px #666;
+    }
+
+    .mini-menu{
+
+        padding:10px 14px;
+    }
+
+    .mini-menu a{
+
+        font-size:18px;
+
+        padding:10px 14px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- TITULO -->
+
+<h2>Teclado</h2>
+
+<!-- PANTALLA -->
+
+<input type="text" id="pantalla" readonly>
+
+<!-- TECLADO -->
+
+<div id="teclado"></div>
+
+<script>
+
+/* ======================================
+   TECLAS
+====================================== */
+
+const letras = [
+
+    ["Q","W","E","R","T","Y","U","I","O","P"],
+
+    ["A","S","D","F","G","H","J","K","L","Ñ"],
+
+    ["Z","X","C","V","B","N","M"],
+
+    ["Limpiar,🧹","Espacio,␣","Eliminar,⌫","Leer,🔊"]
+
+];
+
+/* ======================================
+   CREAR TECLADO
+====================================== */
+
+const contenedor = document.getElementById("teclado");
+
+letras.forEach(fila => {
+
+    const divFila = document.createElement("div");
+
+    divFila.className = "fila";
+
+    fila.forEach(letra => {
+
+        const btn = document.createElement("button");
+
+        if(letra.includes(",")){
+
+            btn.textContent = letra.split(",")[1];
+
+        }else{
+
+            btn.textContent = letra;
+        }
+
+        btn.onclick = () => agregar(letra);
+
+        divFila.appendChild(btn);
+    });
+
+    contenedor.appendChild(divFila);
+});
+
+/* ======================================
+   FUNCIONES
+====================================== */
+
+function agregar(letra){
+
+    const pantalla = document.getElementById("pantalla");
+
+    const accion = letra.split(",")[0];
+
+    /* LIMPIAR */
+
+    if(accion == "Limpiar"){
+
+        pantalla.value = "";
+
+        return;
+    }
+
+    /* ELIMINAR */
+
+    if(accion == "Eliminar"){
+
+        pantalla.value = pantalla.value.slice(0,-1);
+
+        return;
+    }
+
+    /* LEER */
+
+    if(accion == "Leer"){
+
+        const voz = new SpeechSynthesisUtterance(pantalla.value);
+
+        voz.lang = "es-ES";
+
+        speechSynthesis.speak(voz);
+
+        return;
+    }
+
+    /* ESPACIO */
+
+    letra = (accion == "Espacio") ? " " : letra;
+
+    pantalla.value += letra;
+}
+
+</script>
+
+</body>
+
+</html>
