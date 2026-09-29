@@ -270,7 +270,7 @@
     function reiniciarJuego() {
       indiceSiguiente = 0;
       renderizarEscenario();
-      hablar(`¡Hola! Toca el aro con el ${elementos[0].nombreVoz} para que la bailarina dé un salto.`);
+      hablar(`¡Hola! Toca el aro con el ${elementos[0].nombreVoz} `);
     }
 
     // SVG con la Bailarina 50% MÁS GRANDE (36x42 / 48x54)
@@ -378,7 +378,7 @@
           const siguienteElemento = elementos[indiceSiguiente];
           renderizarEscenario();
 
-          hablar(`${elementoEsperado.nombreVoz}. ¡Muy bien! Ahora da un brinco al aro ${siguienteElemento.nombreVoz}`);
+          hablar(`${elementoEsperado.nombreVoz} `);
         }
 
       } else {
@@ -395,9 +395,9 @@
 
         let mensajeError = "";
         if (indexPresionado > indiceSiguiente) {
-          mensajeError = `¡Cuidado! Te saltaste el aro ${esperadoVal}. Tocaste el aro ${presionadoVal}. Primero salta al aro ${esperadoVal}`;
+          mensajeError = `Primero salta al aro ${esperadoVal}`;
         } else {
-          mensajeError = `Ese aro ya lo pasaste. Ahora la bailarina debe saltar al aro ${esperadoVal}`;
+          mensajeError = `Debe saltar al aro ${esperadoVal}`;
         }
 
         hablar(mensajeError);
