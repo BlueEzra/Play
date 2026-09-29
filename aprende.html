@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full w-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pista de Ballet: Aros Mágicos 8-Bits</title>
+
+  <!-- Fuente Pixel Art Retro de Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Press Start 2P', monospace, cursive;
+      user-select: none;
+      -webkit-user-select: none;
+      background-color: #1a0b2e;
+      color: #fff;
+    }
+
+    /* Escenario de Ballet Retro con luces de fondo */
+    .escenario-bg {
+      background-color: #2e1065;
+      background-image: 
+        linear-gradient(90deg, rgba(236, 72, 153, 0.15) 50%, transparent 50%),
+        radial-gradient(circle at 50% 20%, rgba(254, 240, 138, 0.3), transparent 75%);
+      background-size: 60px 100%, 100% 100%;
+      border-bottom: 12px solid #581c87;
+    }
+
+    /* Cortinas de Teatro */
+    .cortina-top {
+      background: repeating-linear-gradient(
+        90deg,
+        #9f1239,
+        #9f1239 30px,
+        #881337 30px,
+        #881337 60px
+      );
+      border-bottom: 4px solid #f59e0b;
+    }
+
+    /* Estilo para los AROS de Ballet (Hoops) */
+    .aro-node {
+      border-radius: 9999px;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+    }
+
+    /* Aro Inactivo (Transparente / Brillante) */
+    .aro-pendiente {
+      border: 8px solid #fbbf24;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.15) 30%, transparent 70%);
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.5), inset 0 0 12px rgba(251, 191, 36, 0.3);
+      color: #fef08a;
+    }
+
+    /* Aro Activo / Objetivo */
+    .aro-actual {
+      border: 9px solid #f43f5e;
+      background: radial-gradient(circle, rgba(244, 63, 94, 0.3) 20%, rgba(251, 207, 232, 0.1) 80%);
+      box-shadow: 0 0 25px #f43f5e, 0 0 45px #f43f5e, inset 0 0 20px #f43f5e;
+      color: #ffffff;
+      animation: pulsoAro 1.2s infinite alternate ease-in-out;
+    }
+
+    /* Aro Ya Completado */
+    .aro-completado {
+      border: 8px solid #10b981;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 30%, transparent 70%);
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.5);
+      color: #a7f3d0;
+    }
+
+    @keyframes pulsoAro {
+      0% { transform: scale(1); filter: brightness(1); }
+      100% { transform: scale(1.08); filter: brightness(1.3); }
+    }
+
+    /* Animación de error / sacudida */
+    @keyframes sacudida {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .error-shake {
+      animation: sacudida 0.4s ease-in-out;
+    }
+
+    /* ANIMACIÓN DE LA BAILARINA DANDO BRINCOS (Grand Jeté / Saltos de Ballet) */
+    @keyframes brincoBallet {
+      0% {
+        transform: translateY(0) scaleX(1) scaleY(1);
+      }
+      25% {
+        transform: translateY(-15px) scaleX(0.9) scaleY(1.1);
+      }
+      50% {
+        transform: translateY(-60px) rotate(10deg) scaleX(1.1) scaleY(0.95);
+      }
+      75% {
+        transform: translateY(-20px) rotate(-5deg) scaleX(1) scaleY(1);
+      }
+      100% {
+        transform: translateY(0) scaleX(1) scaleY(1);
+      }
+    }
+
+    .dancer-jump {
+      animation: brincoBallet 0.9s ease-in-out infinite;
+    }
+
+    /* Ocultar barra de desplazamiento manteniendo funcionalidad */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="h-full w-full flex flex-col justify-between bg-slate-950">
+
+  <!-- JUEGO COMPLETO A TODA LA PANTALLA -->
+  <div class="w-full h-full flex flex-col flex-grow border-4 border-amber-400">
+
+    <!-- CABECERA PRINCIPAL CON MENÚ CENTRADO -->
+    <header class="w-full cortina-top p-3 text-white text-center flex-shrink-0">
+      <h1 class="text-sm md:text-lg text-yellow-300 drop-shadow-[0_2px_0_#000] tracking-wider uppercase mb-2">
+        🩰 PISTA DE STACY 🩰
+      </h1>
+      
+      <!-- Opciones centradas y juntas -->
+      <div class="flex flex-wrap justify-center items-center gap-3 text-[10px] md:text-xs">
+        <div class="flex items-center gap-1">
+          <label for="selector-modo" class="text-yellow-300 font-bold">MODO:</label>
+          <select id="selector-modo" onchange="cambiarModo()" class="bg-pink-400 text-slate-950 font-bold px-3 py-1.5 rounded border-2 border-black cursor-pointer hover:bg-pink-300">
+            <option value="numeros">🔢 Números (1 al 10)</option>
+            <option value="letras">🔤 Vocales (A - U)</option>
+          </select>
+        </div>
+
+        <button onclick="reiniciarJuego()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold px-4 py-1.5 rounded border-2 border-black cursor-pointer active:translate-y-0.5">
+          🔄 REINICIAR
+        </button>
+      </div>
+    </header>
+
+    <!-- PISTA DE ESCENARIO DE BAILE -->
+    <main class="w-full flex-grow escenario-bg overflow-x-auto no-scrollbar relative flex items-center justify-center">
+      
+      <!-- Línea Guía/Carretera en el centro del escenario -->
+      <div class="absolute left-0 right-0 top-[60%] h-3 bg-pink-500/40 border-y-2 border-pink-300 pointer-events-none"></div>
+
+      <!-- Contenedor limitado para exactamente 3 casillas visibles centradas -->
+      <div class="w-full max-w-5xl px-4 h-full flex items-center">
+        <!-- Lista de aros dinámicos -->
+        <div id="lista-casillas" class="flex items-center mx-auto relative z-10 w-full"></div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <script>
+    /* ===================================================================
+       DATOS Y CONFIGURACIÓN DE MODOS
+       =================================================================== */
+    const ARRAY_NUMEROS = Array.from({ length: 10 }, (_, i) => ({
+      valor: (i + 1).toString(),
+      nombreVoz: (i + 1).toString()
+    }));
+
+    const ARRAY_LETRAS = ["A", "E", "I", "O", "U"].map((letra) => ({
+      valor: letra,
+      nombreVoz: letra
+    }));
+
+    let modoActual = "numeros";
+    let elementos = ARRAY_NUMEROS;
+    let indiceSiguiente = 0;
+
+    /* ===================================================================
+       WEB AUDIO API (EFECTOS SINTETIZADOS RETRO)
+       =================================================================== */
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function reproducirSonido(tipo) {
+      if (!audioCtx) audioCtx = new AudioCtx();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const ahora = audioCtx.currentTime;
+
+      if (tipo === 'brinco-ballet') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, ahora); 
+        osc.frequency.exponentialRampToValueAtTime(880, ahora + 0.2); 
+        gain.gain.setValueAtTime(0.25, ahora);
+        gain.gain.exponentialRampToValueAtTime(0.001, ahora + 0.25);
+        osc.start(ahora);
+        osc.stop(ahora + 0.25);
+
+      } else if (tipo === 'error') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, ahora);
+        osc.frequency.setValueAtTime(150, ahora + 0.15);
+        gain.gain.setValueAtTime(0.2, ahora);
+        gain.gain.exponentialRampToValueAtTime(0.001, ahora + 0.35);
+        osc.start(ahora);
+        osc.stop(ahora + 0.35);
+
+      } else if (tipo === 'gran-final') {
+        const notas = [523.25, 659.25, 783.99, 1046.50];
+        notas.forEach((freq, i) => {
+          const subOsc = audioCtx.createOscillator();
+          const subGain = audioCtx.createGain();
+          subOsc.type = 'sine';
+          subOsc.frequency.setValueAtTime(freq, ahora + i * 0.1);
+          subGain.gain.setValueAtTime(0.2, ahora + i * 0.1);
+          subGain.gain.exponentialRampToValueAtTime(0.001, ahora + i * 0.1 + 0.5);
+          subOsc.connect(subGain);
+          subGain.connect(audioCtx.destination);
+          subOsc.start(ahora + i * 0.1);
+          subOsc.stop(ahora + i * 0.1 + 0.5);
+        });
+      }
+    }
+
+    /* ===================================================================
+       LOCUCIÓN EN ESPAÑOL (SPEECH SYNTHESIS API)
+       =================================================================== */
+    function hablar(texto) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+
+      const locucion = new SpeechSynthesisUtterance(texto);
+      locucion.lang = 'es-ES';
+      locucion.rate = 0.85; 
+      locucion.pitch = 1.35; 
+      window.speechSynthesis.speak(locucion);
+    }
+
+    /* ===================================================================
+       LÓGICA DEL JUEGO Y AVANCE LINEAL
+       =================================================================== */
+    function cambiarModo() {
+      const select = document.getElementById("selector-modo");
+      modoActual = select.value;
+      elementos = (modoActual === "numeros") ? ARRAY_NUMEROS : ARRAY_LETRAS;
+      reiniciarJuego();
+    }
+
+    function reiniciarJuego() {
+      indiceSiguiente = 0;
+      renderizarEscenario();
+      hablar(`¡Hola! Toca el aro con el ${elementos[0].nombreVoz} para que la bailarina dé un salto.`);
+    }
+
+    // SVG con la Bailarina 50% MÁS GRANDE (36x42 / 48x54)
+    function generarSvgBailarina() {
+      return `
+        <div class="dancer-jump flex flex-col items-center justify-center">
+          <svg class="w-36 h-42 md:w-48 md:h-54 drop-shadow-[0_8px_0_rgba(0,0,0,0.6)]" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Moño de Pelo/Peinado grande -->
+            <circle cx="40" cy="12" r="10" fill="#f59e0b" />
+            <circle cx="40" cy="12" r="7" fill="#fbbf24" />
+            <rect x="35" y="19" width="10" height="4" fill="#f43f5e" /> <!-- Cinta del moño -->
+
+            <!-- Brazos BAJADOS a los lados (Pose de ballet elegante hacia abajo) -->
+            <path d="M28 58 C 18 62, 14 68, 20 73" stroke="#fed7aa" stroke-width="5" stroke-linecap="round" fill="none" />
+            <path d="M52 58 C 62 62, 66 68, 60 73" stroke="#fed7aa" stroke-width="5" stroke-linecap="round" fill="none" />
+
+            <!-- Sustitución de la cara por la imagen foto.png -->
+            <g>
+              <!-- Borde / Marco rosa circular para la cara -->
+              <circle cx="40" cy="38" r="21" fill="#f43f5e" />
+              <!-- Foto de la persona incrustada -->
+              <image href="foto.png" x="20" y="18" width="40" height="40" preserveAspectRatio="xMidYMid slice" clip-path="url(#face-clip)" />
+              <defs>
+                <clipPath id="face-clip">
+                  <circle cx="40" cy="38" r="19" />
+                </clipPath>
+              </defs>
+            </g>
+
+            <!-- Torso y Vestido -->
+            <path d="M28 56 L52 56 L48 68 L32 68 Z" fill="#f43f5e" />
+            
+            <!-- TUTÚ ESPONJADO Y ACAMPANADO -->
+            <path d="M10 67 C10 67, 22 63, 40 63 C58 63, 70 67, 70 67 C74 75, 60 79, 40 79 C20 79, 6 75, 10 67 Z" fill="#f472b6" />
+            <path d="M15 70 C15 70, 26 66, 40 66 C54 66, 65 70, 65 70 C68 75, 56 78, 40 78 C24 78, 12 75, 15 70 Z" fill="#fbcfe8" />
+
+            <!-- Piernas en posición de salto (Grand Jeté) -->
+            <!-- Pierna Izquierda extendida -->
+            <rect x="22" y="76" width="16" height="6" rx="3" fill="#fed7aa" transform="rotate(-20 22 76)" />
+            <rect x="10" y="80" width="13" height="5" rx="2" fill="#f43f5e" transform="rotate(-10 10 80)" /> <!-- Zapatilla -->
+            
+            <!-- Pierna Derecha extendida atrás -->
+            <rect x="44" y="76" width="16" height="6" rx="3" fill="#fed7aa" transform="rotate(25 44 76)" />
+            <rect x="55" y="83" width="13" height="5" rx="2" fill="#f43f5e" transform="rotate(15 55 83)" /> <!-- Zapatilla -->
+          </svg>
+        </div>
+      `;
+    }
+
+    function renderizarEscenario() {
+      const contenedor = document.getElementById("lista-casillas");
+      contenedor.innerHTML = "";
+
+      elementos.forEach((item, index) => {
+        const divCasilla = document.createElement("div");
+        divCasilla.id = `casilla-${index}`;
+        // Ancho del 33.333% para mostrar 3 casillas ajustadas en pantalla
+        divCasilla.className = "flex flex-col items-center justify-end relative cursor-pointer w-[33.333%] flex-shrink-0 px-2";
+        divCasilla.onclick = () => procesarPasoBallet(index);
+
+        let claseAro = "aro-pendiente";
+        if (index < indiceSiguiente) {
+          claseAro = "aro-completado";
+        } else if (index === indiceSiguiente) {
+          claseAro = "aro-actual";
+        }
+
+        divCasilla.innerHTML = `
+          <!-- Espacio superior para la Bailarina MÁS GRANDE -->
+          <div class="h-40 md:h-52 w-full flex items-center justify-center mb-2">
+            ${index === indiceSiguiente ? generarSvgBailarina() : ''}
+          </div>
+
+          <!-- ARO DE BALLET BRILANTE MÁS GRANDE (32x32 / 40x40) -->
+          <div class="aro-node w-32 h-32 md:w-40 md:h-40 ${claseAro} flex items-center justify-center my-2">
+            <span class="text-3xl md:text-5xl font-black drop-shadow-[0_2px_0_#000]">${item.valor}</span>
+          </div>
+
+          <!-- Etiqueta de Pasito debajo del Aro -->
+          <div class="text-[10px] md:text-xs text-pink-300/80 mt-2 uppercase">
+            ${index < indiceSiguiente ? '✨ Pasado' : (index === indiceSiguiente ? '⭐ Saltar' : '⭕ Aro')}
+          </div>
+        `;
+
+        contenedor.appendChild(divCasilla);
+      });
+
+      // Desplazar suavemente para centrar la casilla activa
+      desplazarPista(indiceSiguiente);
+    }
+
+    function procesarPasoBallet(indexPresionado) {
+      const elementoEsperado = elementos[indiceSiguiente];
+
+      if (indexPresionado === indiceSiguiente) {
+        reproducirSonido('brinco-ballet');
+        
+        indiceSiguiente++;
+
+        if (indiceSiguiente >= elementos.length) {
+          renderizarEscenario();
+          reproducirSonido('gran-final');
+          hablar(`¡Bravo! La bailarina saltó por todos los aros perfectamente.`);
+        } else {
+          const siguienteElemento = elementos[indiceSiguiente];
+          renderizarEscenario();
+
+          hablar(`${elementoEsperado.nombreVoz}. ¡Muy bien! Ahora da un brinco al aro ${siguienteElemento.nombreVoz}`);
+        }
+
+      } else {
+        reproducirSonido('error');
+
+        const elemErróneo = document.getElementById(`casilla-${indexPresionado}`);
+        if (elemErróneo) {
+          elemErróneo.classList.add("error-shake");
+          setTimeout(() => elemErróneo.classList.remove("error-shake"), 400);
+        }
+
+        const presionadoVal = elementos[indexPresionado].valor;
+        const esperadoVal = elementoEsperado.valor;
+
+        let mensajeError = "";
+        if (indexPresionado > indiceSiguiente) {
+          mensajeError = `¡Cuidado! Te saltaste el aro ${esperadoVal}. Tocaste el aro ${presionadoVal}. Primero salta al aro ${esperadoVal}`;
+        } else {
+          mensajeError = `Ese aro ya lo pasaste. Ahora la bailarina debe saltar al aro ${esperadoVal}`;
+        }
+
+        hablar(mensajeError);
+      }
+    }
+
+    function desplazarPista(index) {
+      setTimeout(() => {
+        const elem = document.getElementById(`casilla-${index}`);
+        if (elem) {
+          elem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }, 50);
+    }
+
+    window.onload = () => {
+      renderizarEscenario();
+    };
+  </script>
+</body>
+</html>
