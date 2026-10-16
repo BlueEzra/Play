@@ -353,7 +353,7 @@
 
       letters.forEach((letter, index) => {
         const cardColor = borderColors[index % borderColors.length];
-        const imagePath = `${IMAGES_FOLDER}${letter}${IMAGE_EXTENSION}`;
+        const imagePath = `${IMAGES_FOLDER}${letter.toLowerCase()}${IMAGE_EXTENSION}`;
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -365,7 +365,7 @@
           <div class="card-image-container">
             <img src="${imagePath}" 
                  id="img-card-${index}"
-                 alt="${letter}" 
+                 alt="${letter.toLowerCase()}" 
                  onerror="this.dataset.failed='true'; this.style.display='none'; this.parentElement.innerHTML='<span style=\\'font-size: 44px; font-weight: bold; color: ${cardColor};\\'>${letter}</span>';">
           </div>
           <div class="card-lowercase" style="color: ${cardColor};">${letter.toLowerCase()}</div>
