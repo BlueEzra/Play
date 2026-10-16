@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Material Educativo - Tarjetas y Caligrafía</title>
+  
+  <!-- html2pdf.js para exportación a PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <!-- Fuente delgada y punteada Raleway Dots de Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway+Dots&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7f6;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    /* Pestañas de navegación */
+    .tabs-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      background-color: #e0e0e0;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+      background-color: #4CAF50;
+      color: white;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Contenedores de opciones */
+    .panel {
+      display: none;
+      width: 100%;
+      max-width: 900px;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      margin-bottom: 30px;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    label {
+      font-weight: 600;
+      color: #444;
+    }
+
+    input[type="text"] {
+      padding: 10px 15px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.3s;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    input[type="text"]:focus {
+      border-color: #4CAF50;
+    }
+
+    .btn-action {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-action:hover {
+      background-color: #45a049;
+    }
+
+    .btn-action:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* --- VISTA PREVIA: TARJETAS --- */
+    #cards-pdf-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      padding: 20px;
+      background-color: #ffffff;
+      width: 100%;
+    }
+
+    .card {
+      width: 160px;
+      height: 240px;
+      background-color: #ffffff;
+      border: 4px solid #333;
+      border-radius: 16px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      box-sizing: border-box;
+      page-break-inside: avoid;
+    }
+
+    .hole-punch {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      width: 16px;
+      height: 16px;
+      border: 2px dashed #666;
+      border-radius: 50%;
+      background-color: #ffffff;
+    }
+
+    .card-uppercase {
+      font-size: 36px;
+      font-weight: bold;
+      line-height: 1;
+      margin-top: 5px;
+    }
+
+    .card-image-container {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid #f0f0f0;
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: #fff;
+    }
+
+    .card-image-container img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .card-lowercase {
+      font-size: 30px;
+      font-weight: bold;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    /* --- VISTA PREVIA: HOJA DE EJERCICIOS --- */
+    #tracing-pdf-area {
+      background: white;
+      padding: 20px;
+      width: 100%;
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    /* Encabezado con Nombre Centrado y adaptable */
+    .sheet-header-centered {
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 25px;
+      font-size: 20px;
+      color: #333;
+      text-align: center;
+    }
+
+    .student-name-auto {
+      display: inline-block;
+      min-width: 250px;
+      border-bottom: 2px solid #333;
+      padding: 0 12px 2px 12px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .tracing-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    /* Celdas 50% más altas (87px) y fuente 70% más grande (65px) */
+    .tracing-table tr td {
+      height: 87px;
+      border: 1px dashed #cccccc;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 65px;
+      line-height: 1;
+      position: relative;
+    }
+
+    /* Columna 1: Modelo a color sin fondo */
+    .tracing-table tr td:first-child {
+      border: 2px solid #444;
+      font-weight: bold;
+      background-color: #ffffff;
+    }
+
+    /* Columnas 2 a 6: Trazado ultra delgado minimalista punteado */
+    .tracing-table tr td:not(:first-child) {
+      font-family: 'Raleway Dots', cursive, sans-serif;
+      color: #999999;
+      font-weight: 300;
+    }
+
+    /* Fila vacía para espacios divisorios */
+    .tracing-table tr.separator-row td {
+      height: 35px !important;
+      border: none !important;
+      background-color: transparent !important;
+    }
+
+    /* Estilos de colores por fila para la primera columna */
+    .row-color-0 { color: #e74c3c; }
+    .row-color-1 { color: #3498db; }
+    .row-color-2 { color: #2ecc71; }
+    .row-color-3 { color: #f1c40f; }
+    .row-color-4 { color: #9b59b6; }
+    .row-color-5 { color: #e67e22; }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .tabs-container, .panel, h1 {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Herramientas Educativas</h1>
+
+  <div class="tabs-container">
+    <button class="tab-btn active" onclick="switchTab('cards')">🎴 Generador de Tarjetas</button>
+    <button class="tab-btn" onclick="switchTab('tracing')">📝 Hoja de Ejercicios Dinámica</button>
+  </div>
+
+  <!-- PANEL 1: TARJETAS -->
+  <div id="panel-cards" class="panel active">
+    <div class="input-group">
+      <label for="wordInput">Escribe una palabra:</label>
+      <input type="text" id="wordInput" placeholder="Ej: HOLA" autocomplete="off" oninput="generateCards()">
+      <button id="downloadCardsBtn" class="btn-action" onclick="downloadCardsPDF()" disabled>
+        📄 Descargar PDF de Tarjetas
+      </button>
+    </div>
+    
+    <div id="cards-pdf-area"></div>
+  </div>
+
+  <!-- PANEL 2: HOJA DE EJERCICIOS DINÁMICA -->
+  <div id="panel-tracing" class="panel">
+    <div class="input-group">
+      <label for="tracingInput">Texto para la matriz (usa espacios para separar bloques):</label>
+      <input type="text" id="tracingInput" value="AEIOU aeiou" placeholder="Ej: AEIOU aeiou" oninput="generateTracingSheet()">
+    </div>
+
+    <div class="input-group">
+      <label for="studentNameInput">Nombre del alumno (opcional):</label>
+      <input type="text" id="studentNameInput" placeholder="Escribe el nombre o déjalo en blanco" oninput="generateTracingSheet()">
+      <button class="btn-action" onclick="downloadTracingPDF()">
+        📄 Descargar PDF de Hoja de Ejercicios
+      </button>
+    </div>
+
+    <div id="tracing-pdf-area"></div>
+  </div>
+
+  <script>
+    const IMAGES_FOLDER = "imagenes/educativas/"; 
+    const IMAGE_EXTENSION = ".png";
+    const borderColors = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6', '#e67e22'];
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+
+      if (tab === 'cards') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('panel-cards').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('panel-tracing').classList.add('active');
+        generateTracingSheet();
+      }
+    }
+
+    // --- LÓGICA DE TARJETAS ---
+    function generateCards() {
+      const input = document.getElementById('wordInput').value.toUpperCase();
+      const container = document.getElementById('cards-pdf-area');
+      const downloadBtn = document.getElementById('downloadCardsBtn');
+      
+      container.innerHTML = '';
+      const letters = input.replace(/[^A-ZÑ]/g, '').split('');
+      downloadBtn.disabled = letters.length === 0;
+
+      letters.forEach((letter, index) => {
+        const cardColor = borderColors[index % borderColors.length];
+        const imagePath = `${IMAGES_FOLDER}${letter}${IMAGE_EXTENSION}`;
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.borderColor = cardColor;
+
+        card.innerHTML = `
+          <div class="hole-punch" title="Orificio para perforar"></div>
+          <div class="card-uppercase" style="color: ${cardColor};">${letter}</div>
+          <div class="card-image-container">
+            <img src="${imagePath}" 
+                 id="img-card-${index}"
+                 alt="${letter}" 
+                 onerror="this.dataset.failed='true'; this.style.display='none'; this.parentElement.innerHTML='<span style=\\'font-size: 44px; font-weight: bold; color: ${cardColor};\\'>${letter}</span>';">
+          </div>
+          <div class="card-lowercase" style="color: ${cardColor};">${letter.toLowerCase()}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function getBase64Image(imgElement) {
+      return new Promise((resolve) => {
+        if (!imgElement || imgElement.dataset.failed || !imgElement.complete || imgElement.naturalWidth === 0) {
+          return resolve(null);
+        }
+        fetch(imgElement.src)
+          .then(response => response.blob())
+          .then(blob => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+          })
+          .catch(() => resolve(null));
+      });
+    }
+
+    async function downloadCardsPDF() {
+      const container = document.getElementById('cards-pdf-area');
+      const images = container.querySelectorAll('img');
+
+      for (let img of images) {
+        const base64Src = await getBase64Image(img);
+        if (base64Src) {
+          img.src = base64Src;
+        }
+      }
+
+      const opt = {
+        margin:       10,
+        filename:     'Tarjetas-Educativas.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, allowTaint: true, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(container).save();
+    }
+
+    // --- LÓGICA DE HOJA DE EJERCICIOS ---
+    function generateTracingSheet() {
+      const text = document.getElementById('tracingInput').value;
+      const studentName = document.getElementById('studentNameInput').value.trim();
+      const container = document.getElementById('tracing-pdf-area');
+
+      // Header Centrado con línea adaptable al nombre
+      let headerHTML = `
+        <div class="sheet-header-centered">
+          <strong>Nombre:</strong>
+          <span class="student-name-auto">${studentName}</span>
+        </div>
+      `;
+
+      let tableHTML = `<table class="tracing-table">`;
+      let colorIndex = 0;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+
+        // Si es un espacio, genera una fila divisoria limpia sin bordes
+        if (char === ' ') {
+          tableHTML += `<tr class="separator-row"><td colspan="6"></td></tr>`;
+          continue;
+        }
+
+        const colorClass = `row-color-${colorIndex % borderColors.length}`;
+        colorIndex++;
+
+        tableHTML += `<tr>`;
+        // Columna 1: Modelo a color
+        tableHTML += `<td class="${colorClass}">${char}</td>`;
+        
+        // 5 Columnas de trazado
+        for (let col = 0; col < 5; col++) {
+          tableHTML += `<td>${char}</td>`;
+        }
+        tableHTML += `</tr>`;
+      }
+
+      tableHTML += `</table>`;
+      container.innerHTML = headerHTML + tableHTML;
+    }
+
+    function downloadTracingPDF() {
+      const element = document.getElementById('tracing-pdf-area');
+      const opt = {
+        margin:       10,
+        filename:     'Hoja-de-Ejercicios.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }
+  </script>
+</body>
+</html>
