@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reloj Digital & Cronómetro</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Orbitron for Digital LCD look, Inter for UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            digital: ['Orbitron', 'monospace'],
+          },
+          colors: {
+            neonCyan: '#00f3ff',
+            neonGreen: '#00ff66',
+            neonPink: '#ff0055',
+            neonAmber: '#ffb700',
+            darkBg: '#0a0d14',
+            cardBg: '#121824',
+          },
+          boxShadow: {
+            cyanGlow: '0 0 25px rgba(0, 243, 255, 0.35)',
+            greenGlow: '0 0 25px rgba(0, 255, 102, 0.35)',
+            pinkGlow: '0 0 25px rgba(255, 0, 85, 0.4)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom animations & glow utilities */
+    body {
+      background-color: #0a0d14;
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(0, 243, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 0, 85, 0.05) 0%, transparent 50%);
+      color: #f3f4f6;
+      user-select: none;
+    }
+
+    /* Huge Fluid Typography for Max Visibility on Mobile & Landscape */
+    .fluid-digit-display {
+      font-size: clamp(3.5rem, 18vw, 11rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+    }
+
+    .glow-text-cyan {
+      text-shadow: 0 0 16px rgba(0, 243, 255, 0.7), 0 0 35px rgba(0, 243, 255, 0.35);
+    }
+    
+    .glow-text-green {
+      text-shadow: 0 0 16px rgba(0, 255, 102, 0.7), 0 0 35px rgba(0, 255, 102, 0.35);
+    }
+
+    .glow-text-pink {
+      text-shadow: 0 0 20px rgba(255, 0, 85, 0.85), 0 0 40px rgba(255, 0, 85, 0.5);
+    }
+
+    @keyframes alarmPulse {
+      0%, 100% { background-color: #0a0d14; }
+      50% { background-color: rgba(255, 0, 85, 0.3); }
+    }
+
+    .alarm-active {
+      animation: alarmPulse 0.6s infinite;
+    }
+
+    /* Custom select styling */
+    select option {
+      background-color: #121824;
+      color: #f3f4f6;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-2 sm:p-5 transition-colors duration-300">
+
+  <!-- Header & Select Controls Container -->
+  <header class="w-full max-w-5xl mx-auto bg-cardBg/80 backdrop-blur-md p-3 sm:p-5 rounded-2xl border border-gray-800 shadow-xl mb-2 sm:mb-4">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
+      
+      <!-- Title / Logo -->
+      <div class="flex items-center space-x-3">
+        <div class="p-2 sm:p-2.5 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-xl shadow-cyanGlow">
+          <i class="fa-solid fa-clock text-white text-lg sm:text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold tracking-wide text-white">Chronos Digital</h1>
+          <p class="text-[11px] sm:text-xs text-gray-400">Reloj y Temporizador Multifunción</p>
+        </div>
+      </div>
+
+      <!-- Controls Form -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 w-full md:w-auto">
+        
+        <!-- Select 1: Modo -->
+        <div class="flex flex-col">
+          <label for="modeSelect" class="text-xs font-semibold text-gray-400 mb-1 flex items-center gap-1">
+            <i class="fa-solid fa-sliders text-cyan-400"></i> Modo (Reloc)
+          </label>
+          <select id="modeSelect" class="bg-gray-900/90 text-gray-100 font-medium px-3 py-2 sm:py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-neonCyan transition-all cursor-pointer text-xs sm:text-sm">
+            <option value="clock">Reloj Digital</option>
+            <option value="timer">Cronómetro / Cuenta Regresiva</option>
+          </select>
+        </div>
+
+        <!-- Select 2: A Time (Visible only in timer mode) -->
+        <div id="aTimeContainer" class="flex flex-col hidden">
+          <label for="aTimeSelect" class="text-xs font-semibold text-gray-400 mb-1 flex items-center gap-1">
+            <i class="fa-solid fa-hourglass-half text-neonGreen"></i> A Time (Tiempo)
+          </label>
+          <select id="aTimeSelect" class="bg-gray-900/90 text-gray-100 font-medium px-3 py-2 sm:py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-neonGreen transition-all cursor-pointer text-xs sm:text-sm">
+            <option value="30">30 Segundos</option>
+            <option value="60" selected>1 Minuto</option>
+            <option value="180">3 Minutos</option>
+            <option value="300">5 Minutos</option>
+            <option value="600">10 Minutos</option>
+            <option value="900">15 Minutos</option>
+            <option value="1800">30 Minutos</option>
+            <option value="custom">Personalizado / Manual</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Manual Time Inputs (Shown when "custom" is selected in A Time) -->
+    <div id="manualInputContainer" class="hidden mt-3 pt-3 border-t border-gray-800/80 flex-wrap items-center justify-end gap-2.5">
+      <span class="text-xs font-semibold text-gray-400 w-full sm:w-auto">Tiempo Personalizado:</span>
+      <div class="flex items-center gap-2">
+        <div class="flex items-center bg-gray-900 rounded-xl px-2.5 py-1 border border-gray-700">
+          <input type="number" id="customMinutes" min="0" max="999" value="2" class="w-10 text-center font-bold text-neonCyan bg-transparent focus:outline-none text-sm">
+          <span class="text-[11px] text-gray-400 ml-0.5">min</span>
+        </div>
+        <span class="text-gray-500 font-bold">:</span>
+        <div class="flex items-center bg-gray-900 rounded-xl px-2.5 py-1 border border-gray-700">
+          <input type="number" id="customSeconds" min="0" max="59" value="0" class="w-10 text-center font-bold text-neonCyan bg-transparent focus:outline-none text-sm">
+          <span class="text-[11px] text-gray-400 ml-0.5">seg</span>
+        </div>
+        <button id="btnSetCustom" class="px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-xs rounded-xl shadow-md hover:brightness-110 active:scale-95 transition-all">
+          Establecer
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Display -->
+  <main class="flex-1 flex flex-col items-center justify-center w-full max-w-5xl mx-auto py-1 sm:py-3 px-1">
+    
+    <!-- DIGITAL CLOCK VIEW -->
+    <section id="clockView" class="w-full flex flex-col items-center justify-center my-auto">
+      <!-- Time Display Container -->
+      <div class="bg-cardBg/60 backdrop-blur-lg border border-gray-800/80 rounded-3xl p-4 sm:p-8 md:p-12 w-full text-center shadow-2xl relative overflow-hidden flex flex-col items-center justify-center min-h-[220px] sm:min-h-[320px]">
+        <div class="absolute -top-12 -left-12 w-40 h-40 bg-neonCyan/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-12 -right-12 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Giant Fluid Time Digits -->
+        <div id="clockDisplay" class="font-digital font-bold text-neonCyan glow-text-cyan fluid-digit-display my-auto py-2 w-full break-all">
+          00:00:00
+        </div>
+        
+        <div class="mt-2 sm:mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-gray-300 font-medium text-xs sm:text-base">
+          <span id="clockAmPm" class="bg-gray-900/90 px-3 py-1 rounded-xl border border-gray-800 text-cyan-400 font-bold tracking-wider">AM</span>
+          <span id="clockDate" class="capitalize tracking-wide text-gray-400">Cargando fecha...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TIMER / COUNTDOWN VIEW -->
+    <section id="timerView" class="w-full flex flex-col items-center justify-center my-auto hidden">
+      <div class="bg-cardBg/60 backdrop-blur-lg border border-gray-800/80 rounded-3xl p-4 sm:p-8 md:p-10 w-full text-center shadow-2xl relative overflow-hidden flex flex-col items-center justify-center min-h-[220px] sm:min-h-[320px]">
+        
+        <div class="text-[11px] sm:text-xs uppercase tracking-widest text-gray-400 font-semibold flex items-center justify-center gap-2">
+          <i class="fa-solid fa-stopwatch text-neonGreen"></i> Cuenta Regresiva
+        </div>
+
+        <!-- Giant Fluid Timer Digits -->
+        <div id="timerDisplay" class="font-digital font-bold text-neonGreen glow-text-green fluid-digit-display my-auto py-2 w-full break-all">
+          01:00
+        </div>
+
+        <!-- Status Indicator / Finish Message Banner -->
+        <div id="timerMessage" class="hidden my-2 py-2 px-6 bg-neonPink/20 border border-neonPink rounded-2xl text-neonPink font-extrabold text-xl sm:text-3xl animate-bounce glow-text-pink">
+          <i class="fa-solid fa-bell mr-2"></i> ¡READY!
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-900 rounded-full h-3 my-3 border border-gray-800 overflow-hidden">
+          <div id="timerProgressBar" class="bg-gradient-to-r from-neonGreen to-cyan-400 h-3 rounded-full transition-all duration-300" style="width: 100%"></div>
+        </div>
+
+        <!-- Controls Buttons -->
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mt-2 sm:mt-4 w-full max-w-xl">
+          <button id="btnStart" class="flex-1 min-w-[110px] px-5 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-gray-950 font-extrabold text-sm sm:text-base rounded-2xl shadow-greenGlow active:scale-95 transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-play"></i> Iniciar
+          </button>
+          
+          <button id="btnPause" class="flex-1 min-w-[110px] px-5 py-3 bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30 text-amber-300 font-bold text-sm sm:text-base rounded-2xl active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40" disabled>
+            <i class="fa-solid fa-pause"></i> Pausa
+          </button>
+          
+          <button id="btnReset" class="flex-1 min-w-[110px] px-5 py-3 bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 font-bold text-sm sm:text-base rounded-2xl active:scale-95 transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-right"></i> Reiniciar
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-5xl mx-auto text-center text-[11px] sm:text-xs text-gray-500 py-2">
+    <span>Chronos App • Optimizado con tipografía fluida para horizontal y vertical</span>
+  </footer>
+
+  <!-- App Logic Script -->
+  <script>
+    // Elements Reference
+    const modeSelect = document.getElementById('modeSelect');
+    const aTimeContainer = document.getElementById('aTimeContainer');
+    const aTimeSelect = document.getElementById('aTimeSelect');
+    const manualInputContainer = document.getElementById('manualInputContainer');
+    
+    const clockView = document.getElementById('clockView');
+    const timerView = document.getElementById('timerView');
+    
+    const clockDisplay = document.getElementById('clockDisplay');
+    const clockAmPm = document.getElementById('clockAmPm');
+    const clockDate = document.getElementById('clockDate');
+    
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerProgressBar = document.getElementById('timerProgressBar');
+    const timerMessage = document.getElementById('timerMessage');
+    
+    const btnStart = document.getElementById('btnStart');
+    const btnPause = document.getElementById('btnPause');
+    const btnReset = document.getElementById('btnReset');
+    const btnSetCustom = document.getElementById('btnSetCustom');
+    
+    const customMinutesInput = document.getElementById('customMinutes');
+    const customSecondsInput = document.getElementById('customSeconds');
+
+    // Timer State Variables
+    let totalInitialSeconds = 60;
+    let remainingSeconds = 60;
+    let timerInterval = null;
+    let isRunning = false;
+
+    // --- DIGITAL CLOCK LOGIC ---
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+
+      // 12-hour format for clock
+      hours = hours % 12;
+      hours = hours ? hours : 12; // '0' becomes '12'
+      const formattedHours = String(hours).padStart(2, '0');
+
+      clockDisplay.textContent = `${formattedHours}:${minutes}:${seconds}`;
+      clockAmPm.textContent = ampm;
+
+      // Date Formatting (Spanish)
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      clockDate.textContent = now.toLocaleDateString('es-ES', options);
+    }
+
+    // Start Clock Tick
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // --- MODE SWITCHING LOGIC ---
+    modeSelect.addEventListener('change', (e) => {
+      const mode = e.target.value;
+      if (mode === 'clock') {
+        clockView.classList.remove('hidden');
+        timerView.classList.add('hidden');
+        aTimeContainer.classList.add('hidden');
+        manualInputContainer.classList.add('hidden');
+      } else if (mode === 'timer') {
+        clockView.classList.add('hidden');
+        timerView.classList.remove('hidden');
+        aTimeContainer.classList.remove('hidden');
+        checkATimeSelection();
+      }
+    });
+
+    // --- A TIME / PRESETS LOGIC ---
+    function checkATimeSelection() {
+      const selectedValue = aTimeSelect.value;
+      if (selectedValue === 'custom') {
+        manualInputContainer.classList.remove('hidden');
+        manualInputContainer.classList.add('flex');
+        applyCustomTime();
+      } else {
+        manualInputContainer.classList.add('hidden');
+        manualInputContainer.classList.remove('flex');
+        setTimerSeconds(parseInt(selectedValue, 10));
+      }
+    }
+
+    aTimeSelect.addEventListener('change', checkATimeSelection);
+
+    btnSetCustom.addEventListener('click', () => {
+      applyCustomTime();
+    });
+
+    function applyCustomTime() {
+      const mins = Math.max(0, parseInt(customMinutesInput.value, 10) || 0);
+      const secs = Math.min(59, Math.max(0, parseInt(customSecondsInput.value, 10) || 0));
+      const totalSecs = (mins * 60) + secs;
+      if (totalSecs > 0) {
+        setTimerSeconds(totalSecs);
+      }
+    }
+
+    function setTimerSeconds(seconds) {
+      pauseTimer();
+      totalInitialSeconds = seconds;
+      remainingSeconds = seconds;
+      updateTimerDisplay();
+      stopAlarmVisuals();
+    }
+
+    // Format Seconds to MM:SS or HH:MM:SS
+    function formatTime(secs) {
+      const h = Math.floor(secs / 3600);
+      const m = Math.floor((secs % 3600) / 60);
+      const s = secs % 60;
+
+      const pad = (num) => String(num).padStart(2, '0');
+
+      if (h > 0) {
+        return `${pad(h)}:${pad(m)}:${pad(s)}`;
+      }
+      return `${pad(m)}:${pad(s)}`;
+    }
+
+    function updateTimerDisplay() {
+      timerDisplay.textContent = formatTime(remainingSeconds);
+      
+      // Update Progress Bar
+      const percentage = totalInitialSeconds > 0 
+        ? (remainingSeconds / totalInitialSeconds) * 100 
+        : 0;
+      timerProgressBar.style.width = `${Math.max(0, percentage)}%`;
+    }
+
+    // --- TIMER CONTROLS ---
+    function startTimer() {
+      if (isRunning || remainingSeconds <= 0) return;
+
+      stopAlarmVisuals();
+      isRunning = true;
+      btnStart.disabled = true;
+      btnStart.classList.add('opacity-50', 'cursor-not-allowed');
+      btnPause.disabled = false;
+
+      timerInterval = setInterval(() => {
+        remainingSeconds--;
+        updateTimerDisplay();
+
+        if (remainingSeconds <= 0) {
+          finishTimer();
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      isRunning = false;
+      btnStart.disabled = false;
+      btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
+      btnPause.disabled = true;
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      stopAlarmVisuals();
+      checkATimeSelection();
+    }
+
+    function finishTimer() {
+      pauseTimer();
+      remainingSeconds = 0;
+      updateTimerDisplay();
+      
+      // Trigger Audio & Visual Notifications
+      speakReady();
+      startAlarmVisuals();
+    }
+
+    // --- VOICE ANNOUNCEMENT (Web Speech API) ---
+    function speakReady() {
+      if ('speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance('READY!');
+        utterance.lang = 'en-US';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.2;
+        utterance.volume = 1.0;
+
+        window.speechSynthesis.speak(utterance);
+      } else {
+        // Fallback tone alert using Web Audio API if TTS is unavailable
+        playBeepSound();
+      }
+    }
+
+    // Simple Audio Synthesizer Fallback
+    function playBeepSound() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.value = 880; // A5
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 1.2);
+      } catch (e) {
+        console.warn('Audio play failed:', e);
+      }
+    }
+
+    // --- ALARM VISUAL EFFECTS ---
+    function startAlarmVisuals() {
+      document.body.classList.add('alarm-active');
+      timerMessage.classList.remove('hidden');
+      timerDisplay.classList.remove('text-neonGreen', 'glow-text-green');
+      timerDisplay.classList.add('text-neonPink', 'glow-text-pink');
+    }
+
+    function stopAlarmVisuals() {
+      document.body.classList.remove('alarm-active');
+      timerMessage.classList.add('hidden');
+      timerDisplay.classList.remove('text-neonPink', 'glow-text-pink');
+      timerDisplay.classList.add('text-neonGreen', 'glow-text-green');
+    }
+
+    // Event Listeners
+    btnStart.addEventListener('click', startTimer);
+    btnPause.addEventListener('click', pauseTimer);
+    btnReset.addEventListener('click', resetTimer);
+
+    // Initial Setup
+    updateTimerDisplay();
+  </script>
+</body>
+</html>
